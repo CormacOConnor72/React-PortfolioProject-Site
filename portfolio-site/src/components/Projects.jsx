@@ -10,11 +10,11 @@ const Projects = () => {
     {
       id: 1,
       title: 'E-Commerce Platform',
-      description: 'A full-stack e-commerce solution with React, Node.js, and MongoDB. Features include user authentication, payment processing, and admin dashboard.',
+      description: 'A full-stack e-commerce solution with React frontend and Ruby on Rails API. Features include user authentication, payment processing, and admin dashboard.',
       image: '/api/placeholder/400/250',
-      technologies: ['React', 'Node.js', 'MongoDB', 'Stripe'],
+      technologies: ['React', 'Ruby on Rails', 'PostgreSQL', 'Stripe'],
       category: 'fullstack',
-      github: 'https://github.com/yourusername/ecommerce',
+      github: 'https://github.com/CormacOConnor72/ecommerce',
       live: 'https://yourecommerce.com',
       featured: true
     },
@@ -43,34 +43,34 @@ const Projects = () => {
     {
       id: 4,
       title: 'REST API Server',
-      description: 'A robust REST API built with Express.js and PostgreSQL. Features JWT authentication, rate limiting, and comprehensive documentation.',
+      description: 'A robust REST API built with Ruby on Rails and PostgreSQL. Features JWT authentication, rate limiting, and comprehensive API documentation.',
       image: '/api/placeholder/400/250',
-      technologies: ['Node.js', 'Express', 'PostgreSQL', 'JWT'],
+      technologies: ['Ruby on Rails', 'PostgreSQL', 'JWT', 'RSpec'],
       category: 'backend',
-      github: 'https://github.com/yourusername/api',
+      github: 'https://github.com/CormacOConnor72/api',
       live: null,
       featured: false
     },
     {
       id: 5,
       title: 'Portfolio Website',
-      description: 'A responsive portfolio website built with React and modern CSS. Features smooth animations, dark mode, and optimized performance.',
+      description: 'A responsive portfolio website built with React and modern CSS. Features smooth animations, automated deployment to AWS S3, and optimized performance.',
       image: '/api/placeholder/400/250',
-      technologies: ['React', 'CSS3', 'Vite', 'Responsive Design'],
+      technologies: ['React', 'CSS3', 'Vite', 'AWS S3', 'GitHub Actions'],
       category: 'frontend',
-      github: 'https://github.com/yourusername/portfolio',
+      github: 'https://github.com/CormacOConnor72/portfolio',
       live: 'https://yourportfolio.com',
       featured: false
     },
     {
       id: 6,
-      title: 'Social Media Dashboard',
-      description: 'A comprehensive social media management tool with analytics, post scheduling, and multi-platform integration.',
+      title: 'IT Systems Dashboard',
+      description: 'A comprehensive systems monitoring and management tool with real-time analytics, automated reporting, and multi-system integration.',
       image: '/api/placeholder/400/250',
-      technologies: ['React', 'Node.js', 'Socket.io', 'Chart.js'],
+      technologies: ['React', 'Ruby on Rails', 'WebSocket', 'Chart.js'],
       category: 'fullstack',
-      github: 'https://github.com/yourusername/social-dashboard',
-      live: 'https://yoursocial.com',
+      github: 'https://github.com/CormacOConnor72/systems-dashboard',
+      live: 'https://yoursystems.com',
       featured: true
     }
   ];

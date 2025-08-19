@@ -26,16 +26,16 @@ const About = () => {
   }, []);
 
   const skills = [
-    { name: 'JavaScript', level: 90 },
-    { name: 'React', level: 88 },
-    { name: 'Node.js', level: 82 },
-    { name: 'Python', level: 78 },
-    { name: 'TypeScript', level: 75 },
-    { name: 'CSS/SCSS', level: 85 },
-    { name: 'MongoDB', level: 72 },
-    { name: 'Git', level: 85 },
-    { name: 'AWS', level: 70 },
-    { name: 'Docker', level: 68 }
+    { name: 'React', level: 90 },
+    { name: 'Ruby on Rails', level: 85 },
+    { name: 'JavaScript', level: 88 },
+    { name: 'CSS/SCSS', level: 82 },
+    { name: 'HTML5', level: 85 },
+    { name: 'Git', level: 80 },
+    { name: 'SQL', level: 75 },
+    { name: 'Python', level: 70 },
+    { name: 'System Administration', level: 78 },
+    { name: 'Problem Solving', level: 90 }
   ];
 
   return (
@@ -45,29 +45,28 @@ const About = () => {
           <div className="about-text">
             <h2 className="section-title">About Me</h2>
             <p className="about-description">
-              I'm a passionate software engineer with expertise in full-stack development.
-              I love building innovative web applications using modern technologies like React,
-              Node.js, and cloud platforms. My focus is on creating efficient, scalable solutions
-              that deliver exceptional user experiences.
+              I'm an Information Technology Systems Engineer with a Computer Science degree from 
+              the University of Limerick. I specialize in building web applications using React 
+              for frontend development and Ruby on Rails for backend systems.
             </p>
             <p className="about-description">
-              I'm constantly learning and staying up-to-date with the latest industry trends.
-              Whether it's exploring new frameworks, optimizing performance, or collaborating
-              on challenging projects, I thrive on solving complex technical problems.
+              My passion lies in creating efficient, reliable systems and solving complex technical 
+              challenges. I enjoy working with modern web technologies and am always eager to learn 
+              new tools and frameworks to improve my development skills.
             </p>
             
             <div className="about-stats">
               <div className="stat">
-                <h3>2+</h3>
-                <p>Years Experience</p>
+                <h3>UL</h3>
+                <p>Computer Science Graduate</p>
               </div>
               <div className="stat">
-                <h3>25+</h3>
-                <p>Projects Completed</p>
+                <h3>React</h3>
+                <p>Frontend Specialist</p>
               </div>
               <div className="stat">
-                <h3>10+</h3>
-                <p>Technologies Used</p>
+                <h3>Rails</h3>
+                <p>Backend Experience</p>
               </div>
             </div>
           </div>
