@@ -26,16 +26,46 @@ const About = () => {
   }, []);
 
   const skills = [
-    { name: 'React', level: 90 },
-    { name: 'Ruby on Rails', level: 85 },
-    { name: 'JavaScript', level: 88 },
-    { name: 'CSS/SCSS', level: 82 },
-    { name: 'HTML5', level: 85 },
-    { name: 'Git', level: 80 },
-    { name: 'SQL', level: 75 },
-    { name: 'Python', level: 70 },
-    { name: 'System Administration', level: 78 },
-    { name: 'Problem Solving', level: 90 }
+    { 
+      name: 'React', 
+      description: 'Building modern, responsive user interfaces with hooks, context, and component-based architecture.',
+      icon: '⚛️'
+    },
+    { 
+      name: 'Ruby on Rails', 
+      description: 'Full-stack web development with MVC architecture, ActiveRecord, and RESTful API design.',
+      icon: '💎'
+    },
+    { 
+      name: 'JavaScript', 
+      description: 'Modern ES6+ development, async programming, DOM manipulation, and frontend/backend scripting.',
+      icon: '🟨'
+    },
+    { 
+      name: 'System Administration', 
+      description: 'Server management, deployment automation, monitoring, and maintaining IT infrastructure.',
+      icon: '⚙️'
+    },
+    { 
+      name: 'CSS/SCSS', 
+      description: 'Responsive design, animations, grid/flexbox layouts, and modern styling methodologies.',
+      icon: '🎨'
+    },
+    { 
+      name: 'Database Management', 
+      description: 'SQL optimization, database design, PostgreSQL, and data modeling for scalable applications.',
+      icon: '🗄️'
+    },
+    { 
+      name: 'Git & Version Control', 
+      description: 'Collaborative development workflows, branching strategies, and code review processes.',
+      icon: '🔀'
+    },
+    { 
+      name: 'Problem Solving', 
+      description: 'Analytical thinking, debugging complex issues, and architecting efficient technical solutions.',
+      icon: '🧩'
+    }
   ];
 
   return (
@@ -72,19 +102,14 @@ const About = () => {
           </div>
 
           <div ref={skillsRef} className="about-skills">
-            <h3>Technical Skills</h3>
-            <div className="skills-grid">
+            <h3>Technical Expertise</h3>
+            <div className="skills-list">
               {skills.map((skill, index) => (
-                <div key={index} className="skill-item">
-                  <div className="skill-header">
-                    <span className="skill-name">{skill.name}</span>
-                    <span className="skill-percentage">{skill.level}%</span>
-                  </div>
-                  <div className="skill-bar">
-                    <div 
-                      className="skill-progress" 
-                      style={{ width: `${skill.level}%` }}
-                    ></div>
+                <div key={index} className="skill-card">
+                  <div className="skill-icon">{skill.icon}</div>
+                  <div className="skill-content">
+                    <h4 className="skill-name">{skill.name}</h4>
+                    <p className="skill-description">{skill.description}</p>
                   </div>
                 </div>
               ))}

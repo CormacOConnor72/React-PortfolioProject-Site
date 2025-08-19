@@ -11,10 +11,10 @@
   --secondary-color: #64748b;
   --accent-color: #06b6d4;
   --text-primary: #1e293b;
-  --text-secondary: #64748b;
+  --text-secondary: #262935;
   --text-light: #94a3b8;
-  --background: #6d6d6d;
-  --background-secondary: #86acd1;
+  --background: #86acd1;
+  --background-secondary: #6d6d6d;
   --border-color: #a760e9;
   --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
@@ -154,9 +154,9 @@ section {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.75rem 1.5rem;
+  padding: 0.75rem 2rem;
   border: none;
-  border-radius: var(--border-radius);
+  border-radius: 25px;
   font-size: 1rem;
   font-weight: 600;
   text-decoration: none;
@@ -164,17 +164,34 @@ section {
   transition: var(--transition);
   position: relative;
   overflow: hidden;
+  backdrop-filter: blur(10px);
 }
 
 .btn-primary {
-  background-color: var(--primary-color);
-  color: #6d6d6d;
+  background: linear-gradient(135deg, var(--primary-color), var(--border-color));
+  color: var(--background);
+  border: 2px solid transparent;
 }
 
 .btn-primary:hover {
-  background-color: var(--primary-dark);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(167, 96, 233, 0.4);
+  background: linear-gradient(135deg, var(--border-color), var(--primary-color));
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--primary-color);
+  border: 2px solid var(--border-color);
+  backdrop-filter: blur(10px);
+}
+
+.btn-secondary:hover {
+  background: rgba(167, 96, 233, 0.1);
+  color: var(--border-color);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(167, 96, 233, 0.2);
+  border-color: var(--border-color);
 }
 
 .btn-secondary {
