@@ -44,8 +44,10 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: var(--text-primary);
-  background-color: var(--background);
+  background: linear-gradient(135deg, var(--background) 0%, var(--background-secondary) 100%);
+  background-attachment: fixed;
   line-height: 1.6;
+  overflow-x: hidden;
 }
 
 .container {
@@ -223,6 +225,20 @@ section {
   }
 }
 
+/* Smooth scrolling enhancement */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Global backdrop blur support */
+@supports (backdrop-filter: blur(10px)) {
+  .glass-effect {
+    backdrop-filter: blur(10px);
+  }
+}
+
 /* Utility Classes */
 .highlight {
   background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
@@ -241,8 +257,28 @@ section {
 /* App Layout */
 .App {
   min-height: 100vh;
+  position: relative;
 }
 
 main {
   position: relative;
+  z-index: 1;
+}
+
+/* Section transitions */
+section {
+  position: relative;
+  z-index: 1;
+}
+
+/* Loading animation for smooth transitions */
+.page-transition {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.5s ease-out;
+}
+
+.page-transition.loaded {
+  opacity: 1;
+  transform: translateY(0);
 }
