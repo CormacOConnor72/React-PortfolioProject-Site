@@ -67,7 +67,7 @@
   font-size: 1.1rem;
   color: var(--text-secondary);
   margin-bottom: 1.5rem;
-  line-height: 1.7;
+  line-height: 1.6;
 }
 
 .about-stats {
@@ -123,9 +123,11 @@
 }
 
 .about-skills h3 {
-  font-size: 1.8rem;
+  font-size: 1.75rem;
   margin-bottom: 2rem;
   color: var(--text-primary);
+  font-weight: 700;
+  line-height: 1.3;
 }
 
 .skills-list {
@@ -177,16 +179,17 @@
 }
 
 .skill-name {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 0.5rem;
+  line-height: 1.4;
 }
 
 .skill-description {
   color: var(--text-secondary);
   line-height: 1.6;
-  font-size: 0.95rem;
+  font-size: 1rem;
 }
 
 @media (min-width: 768px) {

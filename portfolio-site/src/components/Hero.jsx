@@ -42,13 +42,6 @@ const Hero = () => {
     }
   };
 
-  const highlights = [
-    { icon: '🎓', label: 'UL Graduate', value: 'Computer Science' },
-    { icon: '⚛️', label: 'Frontend', value: 'React Expert' },
-    { icon: '💎', label: 'Backend', value: 'Ruby on Rails' },
-    { icon: '🚀', label: 'Ready for', value: 'New Opportunities' }
-  ];
-
   return (
     <section className="hero">
       <div className="hero-background">
@@ -67,40 +60,25 @@ const Hero = () => {
           </div>
           
           <h1 ref={titleRef} className="hero-title">
-            <span className="title-greeting">Hello, I'm</span>
-            <span className="highlight">Cormac O'Connor</span>
-            <span className="title-role">IT Systems Engineer</span>
+            Hi, I'm <span className="highlight">Cormac O'Connor</span>
           </h1>
           
           <p ref={subtitleRef} className="hero-subtitle">
-            Transforming ideas into <span className="accent">scalable digital solutions</span> 
-            with modern web technologies
+            Information Technology Systems Engineer
           </p>
           
           <p className="hero-description">
-            UL Computer Science graduate with expertise in React & Ruby on Rails. 
-            I build efficient, user-focused applications that solve real business problems.
-            <strong> Ready to contribute to your team's success.</strong>
+            UL Computer Science graduate with expertise in React and Ruby on Rails. 
+            I build efficient, user-focused applications that solve real business problems 
+            and am ready to contribute to your team's success.
           </p>
-
-          <div className="hero-highlights">
-            {highlights.map((item, index) => (
-              <div key={index} className="highlight-card">
-                <span className="highlight-icon">{item.icon}</span>
-                <div className="highlight-content">
-                  <span className="highlight-label">{item.label}</span>
-                  <span className="highlight-value">{item.value}</span>
-                </div>
-              </div>
-            ))}
-          </div>
           
           <div ref={ctaRef} className="hero-cta">
             <button className="btn btn-primary" onClick={scrollToProjects}>
-              <span>🔍 View My Projects</span>
+              View My Projects
             </button>
             <button className="btn btn-secondary" onClick={scrollToContact}>
-              <span>📧 Let's Connect</span>
+              Get In Touch
             </button>
           </div>
         </div>
@@ -112,19 +90,17 @@ const Hero = () => {
                 <span>👨‍💻</span>
               </div>
             </div>
-            <div className="tech-orbit">
-              <div className="tech-item tech-1">React</div>
-              <div className="tech-item tech-2">Rails</div>
-              <div className="tech-item tech-3">JS</div>
-              <div className="tech-item tech-4">CSS</div>
-            </div>
+            <p className="profile-blurb">
+              Computer Science Graduate <br/>
+              React & Ruby on Rails Developer
+            </p>
           </div>
         </div>
       </div>
       
       <div className="hero-scroll">
         <div className="scroll-indicator">
-          <span>Discover More</span>
+          <span>Scroll Down</span>
           <div className="scroll-arrow"></div>
         </div>
       </div>
