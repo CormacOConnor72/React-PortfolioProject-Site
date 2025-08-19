@@ -50,11 +50,11 @@ const Hero = () => {
             Hi, I'm <span className="highlight">Cormac O'Connor</span>
           </h1>
           <p ref={subtitleRef} className="hero-subtitle">
-            Full Stack Developer & Game Dev Hobbist
+            Full Stack Developer & Software Engineer
           </p>
           <p className="hero-description">
-            I create beautiful, responsive web applications with modern technologies
-            and clean, efficient code.
+            Passionate about creating innovative web applications and solving complex problems 
+            with modern technologies. Experienced in both frontend and backend development.
           </p>
           <div ref={ctaRef} className="hero-cta">
             <button className="btn btn-primary" onClick={scrollToProjects}>

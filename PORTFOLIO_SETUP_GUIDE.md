@@ -599,17 +599,101 @@ npm run build -- --analyze
 
 ## 🚀 Deployment
 
-### Vercel (Recommended)
+### AWS S3 with GitHub Actions (Recommended)
+Automated deployment pipeline that builds and deploys to AWS S3 on every push to main branch.
+
+#### Prerequisites
+- AWS account with S3 bucket
+- GitHub repository
+
+#### Setup Steps
+
+**1. Create S3 Bucket**
+- Create bucket with static website hosting enabled
+- Set index document to `index.html`
+- Configure bucket policy for public read access:
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "PublicReadGetObject",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::YOUR-BUCKET-NAME/*"
+        }
+    ]
+}
+```
+
+**2. AWS IAM Setup**
+Create IAM user with programmatic access and attach policy:
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:PutObject",
+                "s3:DeleteObject",
+                "s3:ListBucket"
+            ],
+            "Resource": [
+                "arn:aws:s3:::YOUR-BUCKET-NAME",
+                "arn:aws:s3:::YOUR-BUCKET-NAME/*"
+            ]
+        }
+    ]
+}
+```
+
+**3. GitHub Secrets Configuration**
+Add these secrets in your GitHub repository (Settings → Secrets and variables → Actions):
+
+- `AWS_ACCESS_KEY_ID` - Your AWS access key
+- `AWS_SECRET_ACCESS_KEY` - Your AWS secret key
+- `AWS_REGION` - Your bucket region (e.g., `us-east-1`)
+- `AWS_S3_BUCKET_NAME` - Your bucket name (without s3:// prefix)
+
+**4. GitHub Actions Workflow**
+The project includes `.github/workflows/deploy.yml` that automatically:
+- Triggers on push to main branch
+- Builds the React app from `portfolio-site/` directory
+- Deploys to S3 using `aws s3 sync`
+- Removes old files with `--delete` flag
+
+**5. Deployment Process**
+```bash
+# Make changes to your portfolio
+git add .
+git commit -m "Update portfolio"
+git push origin main
+```
+
+The GitHub Action will automatically build and deploy your changes!
+
+**6. Access Your Site**
+Your portfolio will be available at:
+`http://YOUR-BUCKET-NAME.s3-website-REGION.amazonaws.com`
+
+### Alternative Deployment Options
+
+#### Vercel
 1. Push code to GitHub
 2. Connect GitHub repo to Vercel
-3. Deploy automatically on push
+3. Set root directory to `portfolio-site`
+4. Deploy automatically on push
 
-### Netlify
+#### Netlify
 1. Build the project: `npm run build`
 2. Upload `dist` folder to Netlify
 3. Configure redirects for SPA
 
-### GitHub Pages
+#### GitHub Pages
 1. Install gh-pages: `npm install --save-dev gh-pages`
 2. Add to package.json:
 ```json
@@ -623,7 +707,7 @@ npm run build -- --analyze
 ```
 3. Deploy: `npm run deploy`
 
-### Custom Server
+#### Custom Server
 1. Build: `npm run build`
 2. Serve `dist` folder with any static server
 3. Configure proper redirects for SPA routing

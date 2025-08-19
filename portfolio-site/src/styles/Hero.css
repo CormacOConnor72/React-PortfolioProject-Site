@@ -12,11 +12,18 @@
 .hero-content {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 3rem;
+  gap: 2rem;
   align-items: center;
   width: 100%;
-  max-width: 1200px;
+  max-width: 1400px;
   padding: 0 1rem;
+}
+
+@media (min-width: 640px) {
+  .hero-content {
+    gap: 3rem;
+    padding: 0 1.5rem;
+  }
 }
 
 @media (min-width: 768px) {
@@ -24,6 +31,20 @@
     grid-template-columns: 1fr 1fr;
     gap: 4rem;
     padding: 0 2rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  .hero-content {
+    gap: 6rem;
+    padding: 0 3rem;
+  }
+}
+
+@media (min-width: 1600px) {
+  .hero-content {
+    max-width: 1600px;
+    padding: 0 4rem;
   }
 }
 
@@ -38,7 +59,7 @@
 }
 
 .hero-title {
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 800;
   line-height: 1.2;
   margin-bottom: 1rem;
@@ -47,9 +68,27 @@
   animation: fadeInUp 0.8s ease-out 0.2s forwards;
 }
 
+@media (min-width: 480px) {
+  .hero-title {
+    font-size: 2.5rem;
+  }
+}
+
 @media (min-width: 768px) {
   .hero-title {
     font-size: 3.5rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  .hero-title {
+    font-size: 4rem;
+  }
+}
+
+@media (min-width: 1600px) {
+  .hero-title {
+    font-size: 4.5rem;
   }
 }
 
@@ -58,12 +97,18 @@
 }
 
 .hero-subtitle {
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   color: var(--text-secondary);
   margin-bottom: 1.5rem;
   opacity: 0;
   transform: translateY(30px);
   animation: fadeInUp 0.8s ease-out 0.4s forwards;
+}
+
+@media (min-width: 480px) {
+  .hero-subtitle {
+    font-size: 1.25rem;
+  }
 }
 
 @media (min-width: 768px) {
@@ -72,23 +117,43 @@
   }
 }
 
+@media (min-width: 1200px) {
+  .hero-subtitle {
+    font-size: 1.75rem;
+  }
+}
+
 .hero-subtitle.animate {
   animation-delay: 0.2s;
 }
 
 .hero-description {
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: var(--text-light);
   margin-bottom: 2rem;
   max-width: 500px;
   margin-left: auto;
   margin-right: auto;
+  line-height: 1.6;
+}
+
+@media (min-width: 480px) {
+  .hero-description {
+    font-size: 1.1rem;
+  }
 }
 
 @media (min-width: 768px) {
   .hero-description {
     margin-left: 0;
     margin-right: 0;
+  }
+}
+
+@media (min-width: 1200px) {
+  .hero-description {
+    font-size: 1.2rem;
+    max-width: 600px;
   }
 }
 
@@ -126,8 +191,8 @@
 
 .profile-image {
   position: relative;
-  width: 300px;
-  height: 300px;
+  width: 250px;
+  height: 250px;
   border-radius: 50%;
   overflow: hidden;
   background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
@@ -135,10 +200,24 @@
   animation: float 6s ease-in-out infinite;
 }
 
+@media (min-width: 480px) {
+  .profile-image {
+    width: 300px;
+    height: 300px;
+  }
+}
+
 @media (min-width: 768px) {
   .profile-image {
     width: 350px;
     height: 350px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .profile-image {
+    width: 400px;
+    height: 400px;
   }
 }
 

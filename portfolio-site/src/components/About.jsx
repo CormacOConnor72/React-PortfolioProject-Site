@@ -27,13 +27,15 @@ const About = () => {
 
   const skills = [
     { name: 'JavaScript', level: 90 },
-    { name: 'React', level: 85 },
-    { name: 'Node.js', level: 80 },
-    { name: 'Python', level: 75 },
+    { name: 'React', level: 88 },
+    { name: 'Node.js', level: 82 },
+    { name: 'Python', level: 78 },
+    { name: 'TypeScript', level: 75 },
     { name: 'CSS/SCSS', level: 85 },
-    { name: 'TypeScript', level: 70 },
-    { name: 'MongoDB', level: 75 },
-    { name: 'Git', level: 80 }
+    { name: 'MongoDB', level: 72 },
+    { name: 'Git', level: 85 },
+    { name: 'AWS', level: 70 },
+    { name: 'Docker', level: 68 }
   ];
 
   return (
@@ -43,29 +45,29 @@ const About = () => {
           <div className="about-text">
             <h2 className="section-title">About Me</h2>
             <p className="about-description">
-              I'm a passionate full-stack developer with a love for creating
-              innovative web solutions. With a background in computer science
-              and years of hands-on experience, I specialize in building
-              responsive, user-friendly applications that solve real-world problems.
+              I'm a passionate software engineer with expertise in full-stack development.
+              I love building innovative web applications using modern technologies like React,
+              Node.js, and cloud platforms. My focus is on creating efficient, scalable solutions
+              that deliver exceptional user experiences.
             </p>
             <p className="about-description">
-              When I'm not coding, you can find me exploring new technologies,
-              contributing to open-source projects, or sharing my knowledge
-              through technical writing and mentoring.
+              I'm constantly learning and staying up-to-date with the latest industry trends.
+              Whether it's exploring new frameworks, optimizing performance, or collaborating
+              on challenging projects, I thrive on solving complex technical problems.
             </p>
             
             <div className="about-stats">
               <div className="stat">
-                <h3>3+</h3>
+                <h3>2+</h3>
                 <p>Years Experience</p>
               </div>
               <div className="stat">
-                <h3>50+</h3>
+                <h3>25+</h3>
                 <p>Projects Completed</p>
               </div>
               <div className="stat">
-                <h3>100%</h3>
-                <p>Client Satisfaction</p>
+                <h3>10+</h3>
+                <p>Technologies Used</p>
               </div>
             </div>
           </div>

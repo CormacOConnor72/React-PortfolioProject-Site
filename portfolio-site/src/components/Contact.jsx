@@ -77,7 +77,7 @@ const Contact = () => {
       icon: '🐙',
       title: 'GitHub',
       details: 'github.com/CormacOConnor72',
-      link: 'hhttps://github.com/CormacOConnor72'
+      link: 'https://github.com/CormacOConnor72'
     },
     {
       icon: '📱',

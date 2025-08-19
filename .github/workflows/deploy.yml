@@ -46,20 +46,10 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
         
-    # Step 6: Check build output
-    - name: Check build output
-      run: |
-        echo "Checking if dist directory exists..."
-        ls -la portfolio-site/
-        echo "Contents of dist directory:"
-        ls -la portfolio-site/dist/ || echo "dist directory not found!"
-        
-    # Step 7: Upload to S3
+    # Step 6: Upload to S3
     - name: Deploy to S3
       run: |
-        echo "Deploying to bucket: ${{ secrets.AWS_S3_BUCKET_NAME }}"
-        echo "Region: ${{ secrets.AWS_REGION }}"
-        aws s3 sync portfolio-site/dist/ s3://${{ secrets.AWS_S3_BUCKET_NAME }}/ --delete --debug
+        aws s3 sync portfolio-site/dist/ s3://${{ secrets.AWS_S3_BUCKET_NAME }}/ --delete
       
     # Optional Step 7: Invalidate CloudFront (if you use it)
     # - name: Invalidate CloudFront
