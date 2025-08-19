@@ -23,14 +23,17 @@ jobs:
       with:
         node-version: '18'  # Use Node.js version 18
         cache: 'npm'        # Cache npm dependencies for faster builds
+        cache-dependency-path: portfolio-site/package-lock.json
         
     # Step 3: Install dependencies
     - name: Install dependencies
       run: npm ci  # Like npm install but faster and more reliable for CI
+      working-directory: ./portfolio-site
       
     # Step 4: Build the React app
     - name: Build React app
       run: npm run build
+      working-directory: ./portfolio-site
       env:
         # Add any environment variables your app needs during build
         CI: false  # Treats warnings as warnings, not errors
@@ -46,7 +49,7 @@ jobs:
     # Step 6: Upload to S3
     - name: Deploy to S3
       run: |
-        aws s3 sync build/ s3://${{ secrets.AWS_S3_BUCKET_NAME }}/ --delete
+        aws s3 sync portfolio-site/dist/ s3://${{ secrets.AWS_S3_BUCKET_NAME }}/ --delete
       
     # Optional Step 7: Invalidate CloudFront (if you use it)
     # - name: Invalidate CloudFront
