@@ -13,9 +13,9 @@
   --text-primary: #1e293b;
   --text-secondary: #64748b;
   --text-light: #94a3b8;
-  --background: #ffffff;
-  --background-secondary: #f8fafc;
-  --border-color: #e2e8f0;
+  --background: #6d6d6d;
+  --background-secondary: #86acd1;
+  --border-color: #a760e9;
   --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
   --border-radius: 8px;
@@ -168,7 +168,7 @@ section {
 
 .btn-primary {
   background-color: var(--primary-color);
-  color: white;
+  color: #6d6d6d;
 }
 
 .btn-primary:hover {
