@@ -1,0 +1,54 @@
+name: Deploy React App to S3
+
+# When this workflow runs
+on:
+  push:
+    branches: [ main ]  # Only when pushing to main branch
+  pull_request:
+    branches: [ main ]  # Also run on PRs to main (for testing)
+
+# The job that does the work
+jobs:
+  deploy:
+    runs-on: ubuntu-latest  # Use Ubuntu server
+    
+    steps:
+    # Step 1: Get the code
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    # Step 2: Set up Node.js environment
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'  # Use Node.js version 18
+        cache: 'npm'        # Cache npm dependencies for faster builds
+        
+    # Step 3: Install dependencies
+    - name: Install dependencies
+      run: npm ci  # Like npm install but faster and more reliable for CI
+      
+    # Step 4: Build the React app
+    - name: Build React app
+      run: npm run build
+      env:
+        # Add any environment variables your app needs during build
+        CI: false  # Treats warnings as warnings, not errors
+        
+    # Step 5: Configure AWS credentials
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+        
+    # Step 6: Upload to S3
+    - name: Deploy to S3
+      run: |
+        aws s3 sync build/ s3://${{ secrets.AWS_S3_BUCKET_NAME }}/ --delete
+      
+    # Optional Step 7: Invalidate CloudFront (if you use it)
+    # - name: Invalidate CloudFront
+    #   run: |
+    #     aws cloudfront create-invalidation --distribution-id YOUR-DISTRIBUTION-ID --paths "/*"
