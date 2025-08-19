@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+
 <!-- saved from url=(0054)https://www.linkedin.com/in/cormac-o-connor-705646261/ -->
 <html lang="en" class="theme theme--mercado app-loader--default artdeco windows"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta http-equiv="origin-trial" content="A7vZI3v+Gz7JfuRolKNM4Aff6zaGuT7X0mf3wtoZTnKv6497cVMnhy03KDqX7kBz/q/iidW7srW31oQbBt4VhgoAAACUeyJvcmlnaW4iOiJodHRwczovL3d3dy5nb29nbGUuY29tOjQ0MyIsImZlYXR1cmUiOiJEaXNhYmxlVGhpcmRQYXJ0eVN0b3JhZ2VQYXJ0aXRpb25pbmczIiwiZXhwaXJ5IjoxNzU3OTgwODAwLCJpc1N1YmRvbWFpbiI6dHJ1ZSwiaXNUaGlyZFBhcnR5Ijp0cnVlfQ==">
     <meta http-equiv="Content-Security-Policy" content="script-src &#39;report-sample&#39; &#39;strict-dynamic&#39; &#39;nonce-7kKgvczPogIfijbg7b94zA&#39;; script-src-attr &#39;none&#39;">

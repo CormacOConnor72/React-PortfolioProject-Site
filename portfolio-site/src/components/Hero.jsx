@@ -86,9 +86,11 @@ const Hero = () => {
         <div className="hero-visual">
           <div className="profile-container">
             <div className="profile-image">
-              <div className="image-placeholder">
-                <span>👨‍💻</span>
-              </div>
+              <img 
+                alt="My Picture" 
+                src="../assets/profile photo.jpg" 
+                style={{ height: "70px", paddingRight: "10px" }} 
+              />  
             </div>
             <p className="profile-blurb">
               Computer Science Graduate <br/>
