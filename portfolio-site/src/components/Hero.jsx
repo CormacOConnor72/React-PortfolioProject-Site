@@ -87,9 +87,9 @@ const Hero = () => {
           <div className="profile-container">
             <div className="profile-image">
               <img 
-                alt="My Picture" 
-                src="../assets/profile photo.jpg" 
-                style={{ height: "70px", paddingRight: "10px" }} 
+                src="/profile-photo.jpg" 
+                alt="Cormac O'Connor - Software Developer"
+                className="profile-photo"
               />  
             </div>
             <p className="profile-blurb">
