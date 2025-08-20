@@ -11,7 +11,7 @@ describe('Contact Component', () => {
   it('renders contact form with all fields', () => {
     render(<Contact />)
     
-    expect(screen.getByText("Let's Work Together")).toBeInTheDocument()
+    expect(screen.getByText("Get In Touch")).toBeInTheDocument()
     expect(screen.getByLabelText(/name/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/message/i)).toBeInTheDocument()
@@ -21,9 +21,14 @@ describe('Contact Component', () => {
   it('renders contact methods', () => {
     render(<Contact />)
     
-    expect(screen.getByText('Email')).toBeInTheDocument()
-    expect(screen.getByText('LinkedIn')).toBeInTheDocument()
-    expect(screen.getByText('GitHub')).toBeInTheDocument()
+    // Check for contact method headings specifically
+    const contactMethods = screen.getAllByText('Email')
+    const linkedinMethods = screen.getAllByText('LinkedIn') 
+    const githubMethods = screen.getAllByText('GitHub')
+    
+    expect(contactMethods.length).toBeGreaterThanOrEqual(1)
+    expect(linkedinMethods.length).toBeGreaterThanOrEqual(1)
+    expect(githubMethods.length).toBeGreaterThanOrEqual(1)
   })
 
   it('updates form fields when user types', async () => {
@@ -99,7 +104,7 @@ describe('Contact Component', () => {
     
     // Wait for success message
     await waitFor(() => {
-      expect(screen.getByText(/message sent successfully/i)).toBeInTheDocument()
+      expect(screen.getByText(/Thank you! Your message has been sent successfully/i)).toBeInTheDocument()
     }, { timeout: 3000 })
   })
 

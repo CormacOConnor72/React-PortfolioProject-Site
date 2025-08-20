@@ -92,9 +92,17 @@ describe('Header Component', () => {
     const user = userEvent.setup()
     renderWithRouter(<Header />)
     
+    // Create a mock element and add it to DOM
+    const mockElement = document.createElement('div')
+    mockElement.id = 'about'
+    document.body.appendChild(mockElement)
+    
     const aboutLink = screen.getByText('About')
     await user.click(aboutLink)
     
     expect(Element.prototype.scrollIntoView).toHaveBeenCalled()
+    
+    // Cleanup
+    document.body.removeChild(mockElement)
   })
 })

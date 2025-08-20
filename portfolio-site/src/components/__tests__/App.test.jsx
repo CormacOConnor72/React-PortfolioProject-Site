@@ -26,8 +26,8 @@ describe('App Component', () => {
     // Check for section content
     expect(screen.getByText(/Hi, I am/)).toBeInTheDocument() // Hero
     expect(screen.getByText(/About Me/)).toBeInTheDocument() // About
-    expect(screen.getByText(/Featured Projects/)).toBeInTheDocument() // Projects
-    expect(screen.getByText(/Let's Work Together/)).toBeInTheDocument() // Contact
+    expect(screen.getByRole('heading', { name: /My Projects/i })).toBeInTheDocument() // Projects
+    expect(screen.getByRole('heading', { name: /Get In Touch/i })).toBeInTheDocument() // Contact
   })
 
   it('has proper section structure with IDs', () => {

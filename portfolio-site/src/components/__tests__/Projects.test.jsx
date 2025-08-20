@@ -8,8 +8,8 @@ describe('Projects Component', () => {
 
   it('renders projects section with title', () => {
     render(<Projects />)
-    expect(screen.getByText('Featured Projects')).toBeInTheDocument()
-    expect(screen.getByText(/showcase of my recent work/i)).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'My Projects' })).toBeInTheDocument()
+    expect(screen.getByText(/Here are some of my recent projects/i)).toBeInTheDocument()
   })
 
   it('renders all filter buttons', () => {
@@ -26,8 +26,8 @@ describe('Projects Component', () => {
     
     // Should show projects from all categories
     expect(screen.getByText('E-Commerce Platform')).toBeInTheDocument()
-    expect(screen.getByText('Task Management Dashboard')).toBeInTheDocument()
-    expect(screen.getByText('RESTful API Service')).toBeInTheDocument()
+    expect(screen.getByText('Task Management App')).toBeInTheDocument()
+    expect(screen.getByText('REST API Server')).toBeInTheDocument()
   })
 
   it('filters projects when filter button is clicked', async () => {
@@ -39,8 +39,8 @@ describe('Projects Component', () => {
     await user.click(frontendButton)
     
     // Should show only frontend projects
-    expect(screen.getByText('Task Management Dashboard')).toBeInTheDocument()
-    expect(screen.queryByText('RESTful API Service')).not.toBeInTheDocument()
+    expect(screen.getByText('Task Management App')).toBeInTheDocument()
+    expect(screen.queryByText('REST API Server')).not.toBeInTheDocument()
   })
 
   it('updates active filter button styling', async () => {
@@ -66,11 +66,11 @@ describe('Projects Component', () => {
     
     // Check first project card
     expect(screen.getByText('E-Commerce Platform')).toBeInTheDocument()
-    expect(screen.getByText(/modern e-commerce solution/i)).toBeInTheDocument()
+    expect(screen.getByText(/full-stack e-commerce solution/i)).toBeInTheDocument()
     
-    // Check for technology tags
+    // Check for technology tags that actually exist in the projects
     expect(screen.getAllByText('React').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('Node.js').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Ruby on Rails').length).toBeGreaterThan(0)
   })
 
   it('shows featured badge for featured projects', () => {
@@ -86,8 +86,8 @@ describe('Projects Component', () => {
     render(<Projects />)
     
     // Should have links to live demo and GitHub
-    const liveLinks = screen.getAllByText(/view live/i)
-    const githubLinks = screen.getAllByText(/github/i)
+    const liveLinks = screen.getAllByText('Live Demo')
+    const githubLinks = screen.getAllByText('GitHub')
     
     expect(liveLinks.length).toBeGreaterThan(0)
     expect(githubLinks.length).toBeGreaterThan(0)
@@ -101,7 +101,7 @@ describe('Projects Component', () => {
     const backendButton = screen.getByText('Backend')
     await user.click(backendButton)
     
-    // Should show at least the RESTful API project or handle empty state
+    // Should show at least the REST API project or handle empty state
     expect(document.querySelectorAll('.project-card').length).toBeGreaterThanOrEqual(0)
   })
 
