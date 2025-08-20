@@ -15,6 +15,9 @@ cd portfolio-site
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build locally
 - `npm run lint` - Run ESLint to check code quality
+- `npm run test` - Run tests in watch mode
+- `npm run test:run` - Run tests once (for CI)
+- `npm run test:ui` - Run tests with visual UI
 
 ### Dependencies Management
 - `npm install` - Install all dependencies
@@ -28,6 +31,7 @@ cd portfolio-site
 - **React Router DOM 6.8.0** for routing (though currently uses hash navigation)
 - **Modern CSS** with CSS custom properties for theming
 - **ESLint** for code quality
+- **Vitest + Testing Library** for component and integration testing
 
 ### Application Structure
 This is a single-page application (SPA) with a section-based navigation system:

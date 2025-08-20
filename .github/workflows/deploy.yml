@@ -30,7 +30,17 @@ jobs:
       run: npm ci  # Like npm install but faster and more reliable for CI
       working-directory: ./portfolio-site
       
-    # Step 4: Build the React app
+    # Step 4: Run linting
+    - name: Run ESLint
+      run: npm run lint
+      working-directory: ./portfolio-site
+      
+    # Step 5: Run tests
+    - name: Run tests
+      run: npm run test:run
+      working-directory: ./portfolio-site
+      
+    # Step 6: Build the React app
     - name: Build React app
       run: npm run build
       working-directory: ./portfolio-site
@@ -38,7 +48,7 @@ jobs:
         # Add any environment variables your app needs during build
         CI: false  # Treats warnings as warnings, not errors
         
-    # Step 5: Configure AWS credentials
+    # Step 7: Configure AWS credentials
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v2
       with:
@@ -46,12 +56,12 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
         
-    # Step 6: Upload to S3
+    # Step 8: Upload to S3
     - name: Deploy to S3
       run: |
         aws s3 sync portfolio-site/dist/ s3://${{ secrets.AWS_S3_BUCKET_NAME }}/ --delete
       
-    # Optional Step 7: Invalidate CloudFront (if you use it)
+    # Optional Step 9: Invalidate CloudFront (if you use it)
     # - name: Invalidate CloudFront
     #   run: |
     #     aws cloudfront create-invalidation --distribution-id YOUR-DISTRIBUTION-ID --paths "/*"

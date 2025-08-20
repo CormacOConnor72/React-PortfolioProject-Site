@@ -20,8 +20,23 @@
               "icon": "lucide-file",
               "title": "PORTFOLIO_SETUP_GUIDE"
             }
+          },
+          {
+            "id": "db3f4e0b7679eb74",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "PORTFOLIO_SETUP_GUIDE.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "PORTFOLIO_SETUP_GUIDE"
+            }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -160,6 +175,7 @@
   },
   "left-ribbon": {
     "hiddenItems": {
+      "bases:Create new base": false,
       "switcher:Open quick switcher": false,
       "graph:Open graph view": false,
       "canvas:Create new canvas": false,
@@ -168,14 +184,14 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "af4420ac7b9666f7",
+  "active": "db3f4e0b7679eb74",
   "lastOpenFiles": [
+    "CLAUDE.md",
     "portfolio-site/src/components/Hero.jsx.tmp.2079.1755648627048",
     "portfolio-site/src/components/Hero.jsx.tmp.2079.1755648621934",
     "portfolio-site/src/styles/Hero.css.tmp.2079.1755647883836",
     "portfolio-site/src/components/Hero.jsx.tmp.2079.1755647868268",
     "portfolio-site/src/assets/profile photo.jpg",
-    "CLAUDE.md",
     "CLAUDE.md.tmp.2079.1755646869410",
     "(13) Cormac O Connor _ LinkedIn.txt",
     "(13) Cormac O Connor _ LinkedIn.html",

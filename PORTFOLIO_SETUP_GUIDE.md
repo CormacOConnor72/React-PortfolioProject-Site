@@ -18,11 +18,12 @@ This is a comprehensive React portfolio website built with modern web developmen
 4. [Component Architecture](#component-architecture)
 5. [Styling System](#styling-system)
 6. [Features Breakdown](#features-breakdown)
-7. [Development Workflow](#development-workflow)
-8. [Customization Guide](#customization-guide)
-9. [Performance Optimization](#performance-optimization)
-10. [Deployment](#deployment)
-11. [Troubleshooting](#troubleshooting)
+7. [Testing](#testing)
+8. [Development Workflow](#development-workflow)
+9. [Customization Guide](#customization-guide)
+10. [Performance Optimization](#performance-optimization)
+11. [Deployment](#deployment)
+12. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -36,6 +37,8 @@ This is a comprehensive React portfolio website built with modern web developmen
 
 ### Development Tools
 - **ESLint** - Code linting and formatting
+- **Vitest** - Fast unit testing framework
+- **Testing Library** - React component testing utilities
 - **Modern JavaScript (ES6+)** - Latest JavaScript features
 - **CSS3** - Advanced styling with animations and responsive design
 
@@ -63,7 +66,12 @@ portfolio-site/
 │   │   ├── Hero.jsx           # Landing section
 │   │   ├── About.jsx          # About section
 │   │   ├── Projects.jsx       # Projects showcase
-│   │   └── Contact.jsx        # Contact form
+│   │   ├── Contact.jsx        # Contact form
+│   │   └── __tests__/         # Component tests
+│   │       ├── Header.test.jsx
+│   │       ├── Contact.test.jsx
+│   │       ├── Projects.test.jsx
+│   │       └── App.test.jsx
 │   ├── styles/                # Component styles
 │   │   ├── Header.css         # Header styling
 │   │   ├── Hero.css           # Hero section styling
@@ -72,6 +80,10 @@ portfolio-site/
 │   │   └── Contact.css        # Contact form styling
 │   ├── assets/                # Static assets
 │   │   └── react.svg          # React logo
+│   ├── test/                  # Test configuration
+│   │   └── setup.js           # Test setup and mocks
+│   ├── __tests__/             # General tests
+│   │   └── responsive.test.js # Responsive design tests
 │   ├── hooks/                 # Custom React hooks (future use)
 │   ├── utils/                 # Utility functions (future use)
 │   ├── App.jsx                # Main app component
@@ -386,6 +398,203 @@ The project uses CSS custom properties for consistent theming:
 
 ---
 
+## 🧪 Testing
+
+### Testing Framework
+The project uses **Vitest** as the testing framework along with **React Testing Library** for component testing. This provides:
+
+- **Fast execution** - Vitest runs tests faster than Jest
+- **Vite integration** - Native support for Vite's build system
+- **Modern features** - ES modules, TypeScript support out of the box
+- **Component testing** - React Testing Library for user-centric tests
+
+### Test Structure
+```
+src/
+├── components/
+│   └── __tests__/          # Component tests
+│       ├── Header.test.jsx
+│       ├── Contact.test.jsx
+│       ├── Projects.test.jsx
+│       └── App.test.jsx
+├── __tests__/              # General tests
+│   └── responsive.test.js
+└── test/
+    └── setup.js            # Test configuration and mocks
+```
+
+### Available Test Commands
+
+#### Development Testing
+```bash
+npm run test              # Run tests in watch mode (development)
+npm run test:ui           # Run tests with visual UI interface
+```
+
+#### CI/Production Testing
+```bash
+npm run test:run          # Run tests once (for CI/CD)
+npm run test:coverage     # Run tests with coverage report
+```
+
+### Test Categories
+
+#### 1. Component Tests
+**Location:** `src/components/__tests__/`
+
+Tests individual React components for:
+- **Rendering** - Components render without crashing
+- **Props handling** - Components receive and use props correctly
+- **User interactions** - Clicks, form submissions, navigation
+- **State management** - Component state updates properly
+- **Accessibility** - Proper ARIA labels and roles
+
+**Example: Header Component Test**
+```javascript
+it('toggles mobile menu when hamburger is clicked', async () => {
+  const user = userEvent.setup()
+  renderWithRouter(<Header />)
+  
+  const hamburger = screen.getByRole('button', { name: /toggle menu/i })
+  await user.click(hamburger)
+  
+  expect(nav).toHaveClass('nav-open')
+})
+```
+
+#### 2. Integration Tests
+**Location:** `src/components/__tests__/App.test.jsx`
+
+Tests how components work together:
+- **Section navigation** - Smooth scrolling between sections
+- **Overall app structure** - Main sections render correctly
+- **Router integration** - URL handling and navigation
+
+#### 3. Form Validation Tests
+**Location:** `src/components/__tests__/Contact.test.jsx`
+
+Tests contact form functionality:
+- **Field validation** - Required fields, email format
+- **Form submission** - Loading states, success/error messages
+- **User experience** - Form clearing, accessibility
+
+**Example: Form Validation Test**
+```javascript
+it('validates required fields on submit', async () => {
+  const user = userEvent.setup()
+  render(<Contact />)
+  
+  const submitButton = screen.getByRole('button', { name: /send message/i })
+  await user.click(submitButton)
+  
+  expect(screen.getByLabelText(/name/i)).toBeInvalid()
+  expect(screen.getByLabelText(/email/i)).toBeInvalid()
+})
+```
+
+#### 4. Responsive Design Tests
+**Location:** `src/__tests__/responsive.test.js`
+
+Tests responsive behavior:
+- **Viewport handling** - Different screen sizes (mobile, tablet, desktop, ultrawide)
+- **Container constraints** - Max-width limits at different breakpoints
+- **Accessibility** - Touch target sizes, spacing requirements
+
+### Testing Best Practices
+
+#### Component Testing Principles
+1. **User-centric testing** - Test what users see and do, not implementation details
+2. **Accessibility testing** - Use semantic queries (getByRole, getByLabelText)
+3. **Async handling** - Properly wait for state updates and DOM changes
+4. **Mock external dependencies** - IntersectionObserver, scroll functions
+
+#### Test Organization
+```javascript
+describe('ComponentName', () => {
+  beforeEach(() => {
+    // Setup before each test
+  })
+  
+  it('describes specific behavior', () => {
+    // Test implementation
+  })
+})
+```
+
+### Mocked APIs and Browser Features
+
+The test setup includes mocks for:
+- **IntersectionObserver** - For scroll-based animations
+- **scrollIntoView** - For smooth scrolling navigation
+- **matchMedia** - For responsive design queries
+- **window.scrollTo** - For programmatic scrolling
+
+### Test Coverage Goals
+
+The test suite covers:
+- ✅ **Navigation functionality** - Header links, mobile menu
+- ✅ **Form validation** - Contact form fields and submission
+- ✅ **Project filtering** - Dynamic project category filtering
+- ✅ **Responsive behavior** - Different viewport sizes
+- ✅ **Core app structure** - Main sections and routing
+
+### Continuous Integration Testing
+
+The deployment pipeline (`deploy.yml`) now includes:
+```yaml
+- name: Run ESLint
+  run: npm run lint
+  
+- name: Run tests
+  run: npm run test:run
+  
+- name: Build React app
+  run: npm run build
+```
+
+This ensures:
+1. **Code quality** - ESLint checks pass
+2. **Test validation** - All tests pass
+3. **Build verification** - App builds successfully
+4. **Deployment** - Only deploys if all checks pass
+
+### Writing New Tests
+
+#### For New Components
+1. Create test file: `src/components/__tests__/NewComponent.test.jsx`
+2. Test rendering, props, user interactions
+3. Follow existing patterns for consistency
+
+#### For New Features
+1. Add feature-specific tests to existing component tests
+2. Create integration tests if feature spans multiple components
+3. Update responsive tests for new breakpoints or layouts
+
+#### Test Template
+```javascript
+import { describe, it, expect } from 'vitest'
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import NewComponent from '../NewComponent'
+
+describe('NewComponent', () => {
+  it('renders correctly', () => {
+    render(<NewComponent />)
+    expect(screen.getByText('Expected Text')).toBeInTheDocument()
+  })
+  
+  it('handles user interaction', async () => {
+    const user = userEvent.setup()
+    render(<NewComponent />)
+    
+    await user.click(screen.getByRole('button'))
+    expect(/* expected behavior */).toBeTruthy()
+  })
+})
+```
+
+---
+
 ## 🔄 Development Workflow
 
 ### Available Scripts
@@ -404,6 +613,10 @@ npm run preview      # Preview production build
 #### Code Quality
 ```bash
 npm run lint         # Run ESLint
+npm run test         # Run tests in watch mode
+npm run test:run     # Run tests once (for CI)
+npm run test:ui      # Run tests with UI
+npm run test:coverage # Run tests with coverage report
 ```
 
 ### Code Style Guidelines

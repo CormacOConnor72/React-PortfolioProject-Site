@@ -44,8 +44,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: var(--text-primary);
-  background: linear-gradient(135deg, var(--background) 0%, var(--background-secondary) 100%);
-  background-attachment: fixed;
+  background: var(--background);
   line-height: 1.6;
   overflow-x: hidden;
 }
@@ -78,7 +77,21 @@ body {
 @media (min-width: 1600px) {
   .container {
     padding: 0 4rem;
-    max-width: 1600px;
+    max-width: 1800px;
+  }
+}
+
+@media (min-width: 2000px) {
+  .container {
+    padding: 0 6rem;
+    max-width: 2200px;
+  }
+}
+
+@media (min-width: 2560px) {
+  .container {
+    padding: 0 8rem;
+    max-width: 2800px;
   }
 }
 
@@ -259,6 +272,7 @@ main {
 section {
   position: relative;
   z-index: 1;
+  background: transparent;
 }
 
 /* Loading animation for smooth transitions */
