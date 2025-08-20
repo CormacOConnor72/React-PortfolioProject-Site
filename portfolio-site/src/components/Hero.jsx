@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import '../styles/Hero.css';
+import profilePhoto from '../assets/profile photo.jpg';
 
 const Hero = () => {
   const titleRef = useRef(null);
@@ -87,8 +88,7 @@ const Hero = () => {
           <div className="profile-container">
             <div className="profile-image">
               <img 
-                src="/profile-photo.jpg" 
-                alt="Cormac O'Connor - Software Developer"
+                src={profilePhoto} 
                 className="profile-photo"
               />  
             </div>
