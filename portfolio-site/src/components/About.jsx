@@ -75,7 +75,7 @@ const About = () => {
           <div className="about-text">
             <h2 className="section-title">About Me</h2>
             <p className="about-description">
-              I'm an Information Technology Systems Engineer with a Computer Science degree from 
+              I&apos;m an Information Technology Systems Engineer with a Computer Science degree from 
               the University of Limerick. I specialize in building web applications using React 
               for frontend development and Ruby on Rails for backend systems.
             </p>

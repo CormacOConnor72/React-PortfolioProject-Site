@@ -1,12 +1,10 @@
-import { describe, it, expect, beforeEach } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { describe, it, expect } from 'vitest'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Projects from '../Projects'
 
 describe('Projects Component', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
+  // Tests don't require setup currently
 
   it('renders projects section with title', () => {
     render(<Projects />)
@@ -79,7 +77,6 @@ describe('Projects Component', () => {
     render(<Projects />)
     
     // Look for featured projects (they should have the featured class or badge)
-    const projectCards = document.querySelectorAll('.project-card')
     const featuredCards = document.querySelectorAll('.project-card.featured')
     
     expect(featuredCards.length).toBeGreaterThan(0)
@@ -105,8 +102,7 @@ describe('Projects Component', () => {
     await user.click(backendButton)
     
     // Should show at least the RESTful API project or handle empty state
-    const projectCards = document.querySelectorAll('.project-card')
-    expect(projectCards.length).toBeGreaterThanOrEqual(0)
+    expect(document.querySelectorAll('.project-card').length).toBeGreaterThanOrEqual(0)
   })
 
   it('shows project overlay on hover', async () => {

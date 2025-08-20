@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import '../styles/Projects.css';
 
 const Projects = () => {
@@ -6,7 +6,7 @@ const Projects = () => {
   const [filteredProjects, setFilteredProjects] = useState([]);
   const sectionRef = useRef(null);
 
-  const projects = [
+  const projects = useMemo(() => [
     {
       id: 1,
       title: 'E-Commerce Platform',
@@ -73,7 +73,7 @@ const Projects = () => {
       live: 'https://yoursystems.com',
       featured: true
     }
-  ];
+  ], []);
 
   const categories = [
     { id: 'all', label: 'All Projects' },
@@ -88,7 +88,7 @@ const Projects = () => {
     } else {
       setFilteredProjects(projects.filter(project => project.category === activeFilter));
     }
-  }, [activeFilter]);
+  }, [activeFilter, projects]);
 
   useEffect(() => {
     const observerOptions = {
@@ -135,7 +135,7 @@ const Projects = () => {
         </div>
 
         <div className="projects-grid">
-          {filteredProjects.map((project, index) => (
+          {filteredProjects.map((project) => (
             <div key={project.id} className={`project-card ${project.featured ? 'featured' : ''}`}>
               <div className="project-image">
                 <img src={project.image} alt={project.title} />

@@ -61,7 +61,7 @@ const Hero = () => {
           </div>
           
           <h1 ref={titleRef} className="hero-title">
-            Hi, I am <span className="highlight">Cormac O'Connor</span>
+            Hi, I am <span className="highlight">Cormac O&apos;Connor</span>
           </h1>
           
           <p ref={subtitleRef} className="hero-subtitle">
@@ -71,7 +71,7 @@ const Hero = () => {
           <p className="hero-description">
             UL Computer Science expect with expertise in React and Ruby on Rails. 
             I build efficient, user-focused applications that solve real business problems 
-            and am ready to contribute to your team's success.
+            and am ready to contribute to your team&apos;s success.
           </p>
           
           <div ref={ctaRef} className="hero-cta">

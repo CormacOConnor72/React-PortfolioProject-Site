@@ -93,16 +93,16 @@ const Contact = () => {
         <div ref={sectionRef} className="contact-header">
           <h2 className="section-title">Get In Touch</h2>
           <p className="section-subtitle">
-            Have a project in mind? Let's work together.
+            Have a project in mind? Let&apos;s work together.
           </p>
         </div>
 
         <div className="contact-content">
           <div className="contact-info">
-            <h3>Let's Connect</h3>
+            <h3>Let&apos;s Connect</h3>
             <p>
-              I'm always interested in hearing about new opportunities and exciting projects.
-              Whether you have a question or just want to say hi, I'll try my best to get back to you!
+              I&apos;m always interested in hearing about new opportunities and exciting projects.
+              Whether you have a question or just want to say hi, I&apos;ll try my best to get back to you!
             </p>
             
             <div className="contact-methods">

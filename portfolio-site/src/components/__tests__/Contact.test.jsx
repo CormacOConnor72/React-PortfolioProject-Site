@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Contact from '../Contact'
 
@@ -135,7 +135,7 @@ describe('Contact Component', () => {
     const githubLink = screen.getByText('github.com/CormacOConnor72').closest('a')
     
     expect(emailLink).toHaveAttribute('href', 'mailto:cormacoconnor72@outlook.ie')
-    expect(linkedinLink).toHaveAttribute('href', 'https://linkedin.com/in/cormac-o-connor-705646261/')
+    expect(linkedinLink).toHaveAttribute('href', 'https://www.linkedin.com/in/cormac-o-connor-705646261/')
     expect(githubLink).toHaveAttribute('href', 'https://github.com/CormacOConnor72')
   })
 })

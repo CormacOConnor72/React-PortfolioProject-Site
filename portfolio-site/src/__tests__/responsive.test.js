@@ -85,7 +85,7 @@ describe('Responsive Design Tests', () => {
         massive: { width: 2560, expectedMaxWidth: '2800px' }
       }
 
-      Object.entries(breakpoints).forEach(([name, { width }]) => {
+      Object.entries(breakpoints).forEach(([, { width }]) => {
         setViewport(width)
         // In a real implementation, we'd check computed styles
         expect(window.innerWidth).toBe(width)
