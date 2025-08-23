@@ -351,7 +351,7 @@ const Wheel = () => {
               {activeFilter !== 'all' && ` (${activeFilter})`}
             </p>
             <p style={{ fontSize: '0.8rem', color: 'var(--text-light)', marginTop: '0.5rem' }}>
-              Debug: localStorage key 'dataManagerEntries' - {localStorage.getItem('dataManagerEntries') ? 'Found' : 'Not found'}
+              Debug: localStorage key &apos;dataManagerEntries&apos; - {localStorage.getItem('dataManagerEntries') ? 'Found' : 'Not found'}
             </p>
           </div>
         </div>
