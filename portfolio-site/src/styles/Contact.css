@@ -44,6 +44,24 @@
   }
 }
 
+@media (min-width: 1200px) {
+  .contact-content {
+    gap: 8rem;
+  }
+}
+
+@media (min-width: 1600px) {
+  .contact-content {
+    gap: 10rem;
+  }
+}
+
+@media (min-width: 2000px) {
+  .contact-content {
+    gap: 12rem;
+  }
+}
+
 .contact-info h3 {
   font-size: 1.75rem;
   color: var(--text-primary);

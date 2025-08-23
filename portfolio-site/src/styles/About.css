@@ -46,6 +46,18 @@
   }
 }
 
+@media (min-width: 1600px) {
+  .about-content {
+    gap: 10rem;
+  }
+}
+
+@media (min-width: 2000px) {
+  .about-content {
+    gap: 12rem;
+  }
+}
+
 .about-text h2 {
   text-align: left;
   margin-bottom: 2rem;

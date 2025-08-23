@@ -44,6 +44,20 @@
   }
 }
 
+@media (min-width: 1600px) {
+  .data-manager-content {
+    grid-template-columns: 450px 1fr;
+    gap: 8rem;
+  }
+}
+
+@media (min-width: 2000px) {
+  .data-manager-content {
+    grid-template-columns: 500px 1fr;
+    gap: 10rem;
+  }
+}
+
 /* Form Section */
 .form-section {
   background: rgba(255, 255, 255, 0.1);
@@ -298,6 +312,12 @@
 }
 
 /* Cell Specific Styles */
+.name-cell {
+  width: 150px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
 .type-cell {
   width: 120px;
 }
@@ -377,7 +397,7 @@
   }
   
   .data-table {
-    min-width: 600px;
+    min-width: 700px;
   }
   
   .data-table th,
@@ -402,7 +422,7 @@
   }
   
   .data-table {
-    min-width: 500px;
+    min-width: 600px;
   }
   
   .data-table th,

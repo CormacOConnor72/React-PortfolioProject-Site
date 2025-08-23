@@ -4,6 +4,7 @@ import '../styles/DataManager.css';
 const DataManager = () => {
   const [entries, setEntries] = useState([]);
   const [formData, setFormData] = useState({
+    name: '',
     type: '',
     who: '',
     why: ''
@@ -59,7 +60,7 @@ const DataManager = () => {
     e.preventDefault();
     
     // Validate form
-    if (!formData.type.trim() || !formData.who.trim() || !formData.why.trim()) {
+    if (!formData.name.trim() || !formData.type.trim() || !formData.who.trim() || !formData.why.trim()) {
       alert('Please fill in all fields');
       return;
     }
@@ -69,6 +70,7 @@ const DataManager = () => {
     // Create new entry with timestamp and ID
     const newEntry = {
       id: Date.now() + Math.random(),
+      name: formData.name.trim(),
       type: formData.type.trim(),
       who: formData.who.trim(),
       why: formData.why.trim(),
@@ -80,6 +82,7 @@ const DataManager = () => {
 
     // Reset form
     setFormData({
+      name: '',
       type: '',
       who: '',
       why: ''
@@ -116,7 +119,7 @@ const DataManager = () => {
         <div ref={sectionRef} className="data-manager-header">
           <h2 className="section-title">Data Manager</h2>
           <p className="section-subtitle">
-            Add and manage your data entries with Type, Who, and Why information
+            Add and manage your data entries with Name, Type, Who, and Why information
           </p>
         </div>
 
@@ -125,6 +128,19 @@ const DataManager = () => {
           <div className="form-section">
             <h3>Add New Entry</h3>
             <form onSubmit={handleSubmit} className="data-form">
+              <div className="form-group">
+                <label htmlFor="name">Name</label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  placeholder="Enter entry name or title"
+                  required
+                />
+              </div>
+
               <div className="form-group">
                 <label htmlFor="type">Type</label>
                 <input
@@ -199,6 +215,7 @@ const DataManager = () => {
                 <table className="data-table">
                   <thead>
                     <tr>
+                      <th>Name</th>
                       <th>Type</th>
                       <th>Who?</th>
                       <th>Why?</th>
@@ -209,6 +226,7 @@ const DataManager = () => {
                   <tbody>
                     {entries.map((entry) => (
                       <tr key={entry.id} className="data-row">
+                        <td className="name-cell">{entry.name}</td>
                         <td className="type-cell">
                           <span className="type-badge">{entry.type}</span>
                         </td>

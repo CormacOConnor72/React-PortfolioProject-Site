@@ -80,9 +80,16 @@
   align-items: center;
   width: 100%;
   max-width: 1400px;
+  margin: 0 auto;
   padding: 0 1rem;
   position: relative;
   z-index: 1;
+}
+
+@media (min-width: 640px) {
+  .hero-content {
+    padding: 0 1.5rem;
+  }
 }
 
 @media (min-width: 768px) {
@@ -97,7 +104,27 @@
   .hero-content {
     gap: 6rem;
     padding: 0 3rem;
-    max-width: 1600px;
+  }
+}
+
+@media (min-width: 1600px) {
+  .hero-content {
+    padding: 0 4rem;
+    max-width: 1800px;
+  }
+}
+
+@media (min-width: 2000px) {
+  .hero-content {
+    padding: 0 6rem;
+    max-width: 2200px;
+  }
+}
+
+@media (min-width: 2560px) {
+  .hero-content {
+    padding: 0 8rem;
+    max-width: 2800px;
   }
 }
 
