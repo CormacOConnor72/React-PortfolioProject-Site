@@ -23,6 +23,8 @@ const DataManager = () => {
   // Save data to localStorage whenever entries change
   useEffect(() => {
     localStorage.setItem('dataManagerEntries', JSON.stringify(entries));
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new CustomEvent('dataManagerUpdate', { detail: entries }));
   }, [entries]);
 
   // Intersection Observer for animations

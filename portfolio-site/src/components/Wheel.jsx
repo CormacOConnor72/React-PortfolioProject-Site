@@ -11,14 +11,48 @@ const Wheel = () => {
   const wheelRef = useRef(null);
   const sectionRef = useRef(null);
 
-  // Load data from localStorage on component mount
+  // Load data from localStorage on component mount and set up listener
   useEffect(() => {
-    const savedEntries = localStorage.getItem('dataManagerEntries');
-    if (savedEntries) {
-      const parsedEntries = JSON.parse(savedEntries);
-      setEntries(parsedEntries);
-      setFilteredEntries(parsedEntries);
-    }
+    const loadEntries = () => {
+      const savedEntries = localStorage.getItem('dataManagerEntries');
+      console.log('Wheel: Loading entries from localStorage:', savedEntries);
+      if (savedEntries) {
+        const parsedEntries = JSON.parse(savedEntries);
+        console.log('Wheel: Parsed entries:', parsedEntries);
+        setEntries(parsedEntries);
+        setFilteredEntries(parsedEntries);
+      } else {
+        console.log('Wheel: No entries found in localStorage');
+        setEntries([]);
+        setFilteredEntries([]);
+      }
+    };
+
+    // Load initial data
+    loadEntries();
+
+    // Listen for storage changes
+    const handleStorageChange = (e) => {
+      if (e.key === 'dataManagerEntries') {
+        console.log('Wheel: Storage changed, reloading entries');
+        loadEntries();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    // Also listen for custom events (for same-tab updates)
+    const handleCustomStorageUpdate = () => {
+      console.log('Wheel: Custom storage update detected');
+      loadEntries();
+    };
+
+    window.addEventListener('dataManagerUpdate', handleCustomStorageUpdate);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('dataManagerUpdate', handleCustomStorageUpdate);
+    };
   }, []);
 
   // Get unique types for filter buttons
@@ -141,7 +175,7 @@ const Wheel = () => {
               All ({entries.length})
             </button>
             {getUniqueTypes().map(type => {
-              const count = entries.filter(entry => entry.type.toLowerCase() === type).length;
+              const count = entries.filter(entry => entry.type.toLowerCase() === type.toLowerCase()).length;
               return (
                 <button
                   key={type}
@@ -152,6 +186,19 @@ const Wheel = () => {
                 </button>
               );
             })}
+            <button
+              className="filter-btn refresh-btn"
+              onClick={() => {
+                const savedEntries = localStorage.getItem('dataManagerEntries');
+                if (savedEntries) {
+                  const parsedEntries = JSON.parse(savedEntries);
+                  setEntries(parsedEntries);
+                  setFilteredEntries(parsedEntries);
+                }
+              }}
+            >
+              🔄 Refresh
+            </button>
           </div>
 
           {/* Winner Banner */}
@@ -302,6 +349,9 @@ const Wheel = () => {
             <p>
               Showing {filteredEntries.length} of {entries.length} entries
               {activeFilter !== 'all' && ` (${activeFilter})`}
+            </p>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-light)', marginTop: '0.5rem' }}>
+              Debug: localStorage key 'dataManagerEntries' - {localStorage.getItem('dataManagerEntries') ? 'Found' : 'Not found'}
             </p>
           </div>
         </div>
