@@ -237,6 +237,40 @@
 }
 
 /* Empty Wheel State */
+.loading-wheel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  background: rgba(59, 130, 246, 0.05);
+  border: 2px solid rgba(59, 130, 246, 0.2);
+  border-radius: 50%;
+  width: 400px;
+  height: 400px;
+  text-align: center;
+}
+
+.loading-wheel .loading-spinner {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  animation: spin 2s linear infinite;
+}
+
+.loading-wheel h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+}
+
+.loading-wheel p {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  max-width: 250px;
+  line-height: 1.5;
+}
+
 .empty-wheel {
   display: flex;
   flex-direction: column;

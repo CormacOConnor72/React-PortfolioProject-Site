@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import dataService from '../services/dataService';
 import '../styles/DataManager.css';
 
 const DataManager = () => {
@@ -10,22 +11,30 @@ const DataManager = () => {
     why: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   const sectionRef = useRef(null);
 
-  // Load data from localStorage on component mount
+  // Load data from AWS API on component mount
   useEffect(() => {
-    const savedEntries = localStorage.getItem('dataManagerEntries');
-    if (savedEntries) {
-      setEntries(JSON.parse(savedEntries));
-    }
+    loadEntries();
   }, []);
 
-  // Save data to localStorage whenever entries change
-  useEffect(() => {
-    localStorage.setItem('dataManagerEntries', JSON.stringify(entries));
-    // Dispatch custom event to notify other components
-    window.dispatchEvent(new CustomEvent('dataManagerUpdate', { detail: entries }));
-  }, [entries]);
+  const loadEntries = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const fetchedEntries = await dataService.getAllEntries();
+      setEntries(fetchedEntries);
+      // Dispatch custom event to notify other components
+      window.dispatchEvent(new CustomEvent('dataManagerUpdate', { detail: fetchedEntries }));
+    } catch (error) {
+      console.error('Failed to load entries:', error);
+      setError('Failed to load entries. Please try refreshing the page.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Intersection Observer for animations
   useEffect(() => {
@@ -58,7 +67,7 @@ const DataManager = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     // Validate form
@@ -68,40 +77,87 @@ const DataManager = () => {
     }
 
     setIsSubmitting(true);
+    setError(null);
 
-    // Create new entry with timestamp and ID
-    const newEntry = {
-      id: Date.now() + Math.random(),
-      name: formData.name.trim(),
-      type: formData.type.trim(),
-      who: formData.who.trim(),
-      why: formData.why.trim(),
-      createdAt: new Date().toISOString()
-    };
+    try {
+      // Create entry data
+      const entryData = {
+        name: formData.name.trim(),
+        type: formData.type.trim(),
+        who: formData.who.trim(),
+        why: formData.why.trim()
+      };
 
-    // Add to entries
-    setEntries(prev => [newEntry, ...prev]);
+      // Save to AWS
+      const newEntry = await dataService.createEntry(entryData);
 
-    // Reset form
-    setFormData({
-      name: '',
-      type: '',
-      who: '',
-      why: ''
-    });
+      // Add to local state
+      setEntries(prev => [newEntry, ...prev]);
 
-    setIsSubmitting(false);
-  };
+      // Reset form
+      setFormData({
+        name: '',
+        type: '',
+        who: '',
+        why: ''
+      });
 
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this entry?')) {
-      setEntries(prev => prev.filter(entry => entry.id !== id));
+      // Notify other components
+      window.dispatchEvent(new CustomEvent('dataManagerUpdate', { detail: [newEntry, ...entries] }));
+      
+      alert('Entry added successfully!');
+    } catch (error) {
+      console.error('Failed to create entry:', error);
+      setError('Failed to add entry. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const handleClearAll = () => {
-    if (window.confirm('Are you sure you want to delete all entries? This cannot be undone.')) {
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this entry?')) {
+      return;
+    }
+
+    try {
+      setError(null);
+      await dataService.deleteEntry(id);
+      
+      // Remove from local state
+      const updatedEntries = entries.filter(entry => entry.id !== id);
+      setEntries(updatedEntries);
+      
+      // Notify other components
+      window.dispatchEvent(new CustomEvent('dataManagerUpdate', { detail: updatedEntries }));
+      
+      alert('Entry deleted successfully!');
+    } catch (error) {
+      console.error('Failed to delete entry:', error);
+      setError('Failed to delete entry. Please try again.');
+    }
+  };
+
+  const handleClearAll = async () => {
+    if (!window.confirm('Are you sure you want to delete all entries? This cannot be undone.')) {
+      return;
+    }
+
+    try {
+      setError(null);
+      setIsLoading(true);
+      await dataService.clearAllEntries();
+      
       setEntries([]);
+      
+      // Notify other components
+      window.dispatchEvent(new CustomEvent('dataManagerUpdate', { detail: [] }));
+      
+      alert('All entries cleared successfully!');
+    } catch (error) {
+      console.error('Failed to clear entries:', error);
+      setError('Failed to clear entries. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -124,6 +180,16 @@ const DataManager = () => {
             Add and manage your data entries with Name, Type, Who, and Why information
           </p>
         </div>
+
+        {error && (
+          <div className="error-banner">
+            <div className="error-content">
+              <span className="error-icon">⚠️</span>
+              <span>{error}</span>
+              <button onClick={() => setError(null)} className="error-dismiss">✕</button>
+            </div>
+          </div>
+        )}
 
         <div className="data-manager-content">
           {/* Form Section */}
@@ -206,7 +272,13 @@ const DataManager = () => {
               )}
             </div>
 
-            {entries.length === 0 ? (
+            {isLoading ? (
+              <div className="loading-state">
+                <div className="loading-spinner">🔄</div>
+                <h4>Loading entries...</h4>
+                <p>Fetching data from AWS</p>
+              </div>
+            ) : entries.length === 0 ? (
               <div className="empty-state">
                 <div className="empty-icon">📝</div>
                 <h4>No entries yet</h4>

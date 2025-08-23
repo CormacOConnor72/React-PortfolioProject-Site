@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import dataService from '../services/dataService';
 import '../styles/Wheel.css';
 
 const Wheel = () => {
@@ -8,52 +9,45 @@ const Wheel = () => {
   const [isSpinning, setIsSpinning] = useState(false);
   const [selectedEntry, setSelectedEntry] = useState(null);
   const [rotation, setRotation] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   const wheelRef = useRef(null);
   const sectionRef = useRef(null);
 
-  // Load data from localStorage on component mount and set up listener
+  // Load data from AWS API on component mount and set up listener
   useEffect(() => {
-    const loadEntries = () => {
-      const savedEntries = localStorage.getItem('dataManagerEntries');
-      console.log('Wheel: Loading entries from localStorage:', savedEntries);
-      if (savedEntries) {
-        const parsedEntries = JSON.parse(savedEntries);
-        console.log('Wheel: Parsed entries:', parsedEntries);
-        setEntries(parsedEntries);
-        setFilteredEntries(parsedEntries);
-      } else {
-        console.log('Wheel: No entries found in localStorage');
-        setEntries([]);
-        setFilteredEntries([]);
-      }
-    };
-
-    // Load initial data
     loadEntries();
 
-    // Listen for storage changes
-    const handleStorageChange = (e) => {
-      if (e.key === 'dataManagerEntries') {
-        console.log('Wheel: Storage changed, reloading entries');
-        loadEntries();
-      }
+    // Listen for custom events (when DataManager updates)
+    const handleDataManagerUpdate = (event) => {
+      console.log('Wheel: DataManager update detected', event.detail);
+      setEntries(event.detail);
+      setFilteredEntries(event.detail);
     };
 
-    window.addEventListener('storage', handleStorageChange);
-
-    // Also listen for custom events (for same-tab updates)
-    const handleCustomStorageUpdate = () => {
-      console.log('Wheel: Custom storage update detected');
-      loadEntries();
-    };
-
-    window.addEventListener('dataManagerUpdate', handleCustomStorageUpdate);
+    window.addEventListener('dataManagerUpdate', handleDataManagerUpdate);
 
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('dataManagerUpdate', handleCustomStorageUpdate);
+      window.removeEventListener('dataManagerUpdate', handleDataManagerUpdate);
     };
   }, []);
+
+  const loadEntries = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      console.log('Wheel: Loading entries from AWS API...');
+      const fetchedEntries = await dataService.getAllEntries();
+      console.log('Wheel: Fetched entries:', fetchedEntries);
+      setEntries(fetchedEntries);
+      setFilteredEntries(fetchedEntries);
+    } catch (error) {
+      console.error('Wheel: Failed to load entries:', error);
+      setError('Failed to load entries from server');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Get unique types for filter buttons
   const getUniqueTypes = () => {
@@ -188,16 +182,10 @@ const Wheel = () => {
             })}
             <button
               className="filter-btn refresh-btn"
-              onClick={() => {
-                const savedEntries = localStorage.getItem('dataManagerEntries');
-                if (savedEntries) {
-                  const parsedEntries = JSON.parse(savedEntries);
-                  setEntries(parsedEntries);
-                  setFilteredEntries(parsedEntries);
-                }
-              }}
+              onClick={loadEntries}
+              disabled={isLoading}
             >
-              🔄 Refresh
+              🔄 {isLoading ? 'Loading...' : 'Refresh'}
             </button>
           </div>
 
@@ -217,9 +205,25 @@ const Wheel = () => {
             </div>
           )}
 
+          {error && (
+            <div className="error-banner">
+              <div className="error-content">
+                <span className="error-icon">⚠️</span>
+                <span>{error}</span>
+                <button onClick={() => setError(null)} className="error-dismiss">✕</button>
+              </div>
+            </div>
+          )}
+
           {/* Wheel Container */}
           <div className="wheel-container">
-            {filteredEntries.length === 0 ? (
+            {isLoading ? (
+              <div className="loading-wheel">
+                <div className="loading-spinner">🔄</div>
+                <h3>Loading entries...</h3>
+                <p>Fetching shared data from AWS</p>
+              </div>
+            ) : filteredEntries.length === 0 ? (
               <div className="empty-wheel">
                 <div className="empty-icon">🎯</div>
                 <h3>No entries to spin!</h3>
@@ -351,7 +355,7 @@ const Wheel = () => {
               {activeFilter !== 'all' && ` (${activeFilter})`}
             </p>
             <p style={{ fontSize: '0.8rem', color: 'var(--text-light)', marginTop: '0.5rem' }}>
-              Debug: localStorage key &apos;dataManagerEntries&apos; - {localStorage.getItem('dataManagerEntries') ? 'Found' : 'Not found'}
+              Status: {isLoading ? 'Loading from AWS...' : error ? 'Error loading data' : 'Connected to shared AWS database'}
             </p>
           </div>
         </div>
