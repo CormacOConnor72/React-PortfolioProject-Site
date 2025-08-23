@@ -49,6 +49,11 @@ const Header = () => {
               </a>
             </li>
             <li>
+              <a href="#data" onClick={(e) => { e.preventDefault(); scrollToSection('data'); }}>
+                Data Manager
+              </a>
+            </li>
+            <li>
               <a href="#contact" onClick={(e) => { e.preventDefault(); scrollToSection('contact'); }}>
                 Contact
               </a>

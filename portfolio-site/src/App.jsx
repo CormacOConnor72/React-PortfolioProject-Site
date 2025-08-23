@@ -3,6 +3,7 @@ import Header from './components/Header';
 import Hero from './components/Hero';
 import About from './components/About';
 import Projects from './components/Projects';
+import DataManager from './components/DataManager';
 import Contact from './components/Contact';
 import './App.css';
 
@@ -20,6 +21,9 @@ function App() {
           </section>
           <section id="projects">
             <Projects />
+          </section>
+          <section id="data">
+            <DataManager />
           </section>
           <section id="contact">
             <Contact />
