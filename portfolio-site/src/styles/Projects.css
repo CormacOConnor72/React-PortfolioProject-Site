@@ -1,5 +1,5 @@
 .projects {
-  background: linear-gradient(180deg, var(--background-secondary) 0%, var(--background) 100%);
+  background: transparent;
   position: relative;
   overflow: hidden;
 }

@@ -44,7 +44,13 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: var(--text-primary);
-  background: var(--background);
+  background: linear-gradient(180deg, 
+    var(--background) 0%,
+    var(--background-secondary) 25%,
+    var(--background) 50%,
+    var(--background-secondary) 75%,
+    var(--background) 100%);
+  background-attachment: fixed;
   line-height: 1.6;
   overflow-x: hidden;
 }

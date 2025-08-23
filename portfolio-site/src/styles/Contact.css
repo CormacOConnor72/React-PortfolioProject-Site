@@ -1,5 +1,5 @@
 .contact {
-  background: linear-gradient(180deg, var(--background) 0%, var(--background-secondary) 100%);
+  background: transparent;
   position: relative;
   overflow: hidden;
 }

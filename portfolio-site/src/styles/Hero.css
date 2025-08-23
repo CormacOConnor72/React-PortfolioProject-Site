@@ -5,7 +5,7 @@
   justify-content: center;
   align-items: center;
   position: relative;
-  background: linear-gradient(180deg, var(--background) 0%, var(--background-secondary) 50%, var(--background) 100%);
+  background: transparent;
   padding-top: 70px;
   overflow: hidden;
 }
