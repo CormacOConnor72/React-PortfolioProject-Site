@@ -4,6 +4,7 @@ import Hero from './components/Hero';
 import About from './components/About';
 import Projects from './components/Projects';
 import DataManager from './components/DataManager';
+import Wheel from './components/Wheel';
 import Contact from './components/Contact';
 import './App.css';
 
@@ -24,6 +25,9 @@ function App() {
           </section>
           <section id="data">
             <DataManager />
+          </section>
+          <section id="wheel">
+            <Wheel />
           </section>
           <section id="contact">
             <Contact />
