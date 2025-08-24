@@ -32,7 +32,7 @@ cd portfolio-site
 - **Modern CSS** with CSS custom properties for theming
 - **ESLint** for code quality
 - **Vitest + Testing Library** for component and integration testing
-
+s
 ### Application Structure
 This is a single-page application (SPA) with a section-based navigation system:
 
