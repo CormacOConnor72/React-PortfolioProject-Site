@@ -57,13 +57,13 @@ const Hero = () => {
           </h1>
           
           <p ref={subtitleRef} className="hero-subtitle">
-            Information Technology Systems Engineer
+            IT Systems Engineer & Full Stack Developer
           </p>
           
           <p className="hero-description">
-            UL Computer Science expect with expertise in React and Ruby on Rails. 
-            I build efficient, user-focused applications that solve real business problems 
-            and am ready to contribute to your team&apos;s success.
+            Computer Game Development graduate from University of Limerick with expertise in React, 
+            TypeScript, and Ruby on Rails. Currently working as an IT Systems Engineer specializing 
+            in cloud infrastructure while building full-stack applications that solve real business problems.
           </p>
           
           <div ref={ctaRef} className="hero-cta">
@@ -85,8 +85,8 @@ const Hero = () => {
               />  
             </div>
             <p className="profile-blurb">
-              Computer Science Graduate <br/>
-              React & Ruby on Rails Developer
+              Computer Game Development Graduate <br/>
+              IT Systems Engineer & Full Stack Developer
             </p>
           </div>
         </div>

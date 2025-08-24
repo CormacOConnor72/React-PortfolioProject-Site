@@ -27,8 +27,13 @@ const About = () => {
 
   const skills = [
     { 
-      name: 'React', 
-      description: 'Building modern, responsive user interfaces with hooks, context, and component-based architecture.',
+      name: 'Cloud Infrastructure', 
+      description: 'Azure, Datto, Citrix Cloud, ControlUp, Active Directory/Entra ID, and VMware vSphere management.',
+      icon: '☁️'
+    },
+    { 
+      name: 'React & TypeScript', 
+      description: 'Building scalable frontend applications serving 500k+ users with modern React patterns and TypeScript.',
       icon: '⚛️'
     },
     { 
@@ -37,34 +42,29 @@ const About = () => {
       icon: '💎'
     },
     { 
-      name: 'JavaScript', 
-      description: 'Modern ES6+ development, async programming, DOM manipulation, and frontend/backend scripting.',
-      icon: '🟨'
+      name: 'Programming Languages', 
+      description: 'Proficient in Java, Python, JavaScript, C#/C++, SQL (PostgreSQL), Ruby, and Bash/Shell scripting.',
+      icon: '💻'
     },
     { 
       name: 'System Administration', 
-      description: 'Server management, deployment automation, monitoring, and maintaining IT infrastructure.',
+      description: 'Linux (Debian/Kali), Windows, macOS administration, Docker containerization, and IT infrastructure.',
       icon: '⚙️'
     },
     { 
-      name: 'CSS/SCSS', 
-      description: 'Responsive design, animations, grid/flexbox layouts, and modern styling methodologies.',
-      icon: '🎨'
+      name: 'Development Tools', 
+      description: 'Git, VS Code, IntelliJ, PyCharm, Visual Studio, Firebase, Unity, and comprehensive testing frameworks.',
+      icon: '🛠️'
     },
     { 
-      name: 'Database Management', 
-      description: 'SQL optimization, database design, PostgreSQL, and data modeling for scalable applications.',
-      icon: '🗄️'
+      name: 'Data & Analytics', 
+      description: 'Pandas, NumPy, Matplotlib, Jupyter Notebook for data science and AI application development.',
+      icon: '📊'
     },
     { 
-      name: 'Git & Version Control', 
-      description: 'Collaborative development workflows, branching strategies, and code review processes.',
-      icon: '🔀'
-    },
-    { 
-      name: 'Problem Solving', 
-      description: 'Analytical thinking, debugging complex issues, and architecting efficient technical solutions.',
-      icon: '🧩'
+      name: 'Game Development', 
+      description: 'Unity engine, C# scripting, 3D modeling with Blender, physics, and level design for interactive experiences.',
+      icon: '🎮'
     }
   ];
 
@@ -75,28 +75,29 @@ const About = () => {
           <div className="about-text">
             <h2 className="section-title">About Me</h2>
             <p className="about-description">
-              I&apos;m an Information Technology Systems Engineer with a Computer Science degree from 
-              the University of Limerick. I specialize in building web applications using React 
-              for frontend development and Ruby on Rails for backend systems.
+              I&apos;m an IT Systems Engineer with a Bachelor of Science in Computer Game Development 
+              from the University of Limerick (Second Class Honours Grade 1). I specialize in cloud 
+              infrastructure management with Azure, React frontend development, and Ruby on Rails backend systems.
             </p>
             <p className="about-description">
-              My passion lies in creating efficient, reliable systems and solving complex technical 
-              challenges. I enjoy working with modern web technologies and am always eager to learn 
-              new tools and frameworks to improve my development skills.
+              Currently working at John Paul Construction managing IT cloud infrastructure and maintaining 
+              systems for 1000+ devices. Previously worked as a Full Stack Software Engineer Intern at 
+              WpEngine, contributing to a customer-facing web portal serving 500k+ users using React, 
+              TypeScript, and Ruby on Rails.
             </p>
             
             <div className="about-stats">
               <div className="stat">
-                <h3>UL</h3>
-                <p>Computer Science Graduate</p>
+                <h3>2024</h3>
+                <p>UL Graduate</p>
               </div>
               <div className="stat">
-                <h3>React</h3>
-                <p>Frontend Specialist</p>
+                <h3>500k+</h3>
+                <p>Users Served</p>
               </div>
               <div className="stat">
-                <h3>Rails</h3>
-                <p>Backend Experience</p>
+                <h3>1000+</h3>
+                <p>Devices Managed</p>
               </div>
             </div>
           </div>

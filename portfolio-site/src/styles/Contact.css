@@ -213,6 +213,10 @@
   align-self: flex-start;
   position: relative;
   z-index: 1;
+  overflow: hidden;
+  background-clip: padding-box;
+  backface-visibility: hidden;
+  transform: translateZ(0);
 }
 
 .submit-btn:hover:not(:disabled) {

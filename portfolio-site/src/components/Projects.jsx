@@ -9,77 +9,79 @@ const Projects = () => {
   const projects = useMemo(() => [
     {
       id: 1,
-      title: 'E-Commerce Platform',
-      description: 'A full-stack e-commerce solution with React frontend and Ruby on Rails API. Features include user authentication, payment processing, and admin dashboard.',
+      title: 'Grid Runners',
+      description: 'A first-person shooter game developed in Unity with custom models, physics, scripting, level design, and UI. Final year project that received a B1 grade.',
       image: '/api/placeholder/400/250',
-      technologies: ['React', 'Ruby on Rails', 'PostgreSQL', 'Stripe'],
-      category: 'fullstack',
-      github: 'https://github.com/CormacOConnor72/ecommerce',
-      live: 'https://yourecommerce.com',
+      technologies: ['Unity', 'C#', 'Blender', 'Git', 'Obsidian'],
+      category: 'game',
+      github: 'https://github.com/CormacOConnor72',
+      live: null,
       featured: true
     },
     {
       id: 2,
-      title: 'Task Management App',
-      description: 'A responsive task management application built with React and Firebase. Includes real-time updates, drag-and-drop functionality, and team collaboration.',
+      title: 'Flask AI Sentiment Site',
+      description: 'Web application using Flask that allows text input for AI-powered emotion and sentiment detection. Built using Agile methodologies with version control.',
       image: '/api/placeholder/400/250',
-      technologies: ['React', 'Firebase', 'CSS3', 'Context API'],
-      category: 'frontend',
-      github: 'https://github.com/yourusername/taskapp',
-      live: 'https://yourtaskapp.com',
+      technologies: ['Flask', 'Python', 'AI API', 'Git', 'HTML/CSS'],
+      category: 'fullstack',
+      github: 'https://github.com/CormacOConnor72',
+      live: null,
       featured: true
     },
     {
       id: 3,
-      title: 'Weather Dashboard',
-      description: 'A clean weather application with location-based forecasts, historical data, and interactive charts using OpenWeather API.',
+      title: 'WpEngine Customer Portal',
+      description: 'Contributed to a customer-facing web portal serving 500k+ users as part of Team Athena. Built with React, TypeScript, and Ruby on Rails in an Agile environment.',
       image: '/api/placeholder/400/250',
-      technologies: ['JavaScript', 'Chart.js', 'OpenWeather API', 'CSS3'],
-      category: 'frontend',
-      github: 'https://github.com/yourusername/weather',
-      live: 'https://yourweather.com',
-      featured: false
+      technologies: ['React', 'TypeScript', 'Ruby on Rails', 'PostgreSQL'],
+      category: 'fullstack',
+      github: null,
+      live: null,
+      featured: true
     },
     {
       id: 4,
-      title: 'REST API Server',
-      description: 'A robust REST API built with Ruby on Rails and PostgreSQL. Features JWT authentication, rate limiting, and comprehensive API documentation.',
+      title: 'IT Infrastructure Management',
+      description: 'Professional experience managing cloud infrastructure for 1000+ devices including Azure, Datto, Citrix Cloud, and Active Directory systems.',
       image: '/api/placeholder/400/250',
-      technologies: ['Ruby on Rails', 'PostgreSQL', 'JWT', 'RSpec'],
-      category: 'backend',
-      github: 'https://github.com/CormacOConnor72/api',
+      technologies: ['Azure', 'Active Directory', 'Citrix Cloud', 'Datto', 'ControlUp'],
+      category: 'infrastructure',
+      github: null,
       live: null,
       featured: false
     },
     {
       id: 5,
       title: 'Portfolio Website',
-      description: 'A responsive portfolio website built with React and modern CSS. Features smooth animations, automated deployment to AWS S3, and optimized performance.',
+      description: 'This responsive portfolio website built with React and modern CSS. Features smooth animations, optimized performance, and showcases my professional work.',
       image: '/api/placeholder/400/250',
-      technologies: ['React', 'CSS3', 'Vite', 'AWS S3', 'GitHub Actions'],
+      technologies: ['React', 'CSS3', 'Vite', 'JavaScript'],
       category: 'frontend',
-      github: 'https://github.com/CormacOConnor72/portfolio',
-      live: 'https://yourportfolio.com',
+      github: 'https://github.com/CormacOConnor72',
+      live: null,
       featured: false
     },
     {
       id: 6,
-      title: 'IT Systems Dashboard',
-      description: 'A comprehensive systems monitoring and management tool with real-time analytics, automated reporting, and multi-system integration.',
+      title: 'ISO27001 Documentation System',
+      description: 'Led the creation and maintenance of IT processes and departmental procedures documentation that contributed to company achieving ISO27001 certification.',
       image: '/api/placeholder/400/250',
-      technologies: ['React', 'Ruby on Rails', 'WebSocket', 'Chart.js'],
-      category: 'fullstack',
-      github: 'https://github.com/CormacOConnor72/systems-dashboard',
-      live: 'https://yoursystems.com',
-      featured: true
+      technologies: ['Documentation', 'Process Management', 'ISO27001', 'IT Security'],
+      category: 'documentation',
+      github: null,
+      live: null,
+      featured: false
     }
   ], []);
 
   const categories = [
     { id: 'all', label: 'All Projects' },
+    { id: 'fullstack', label: 'Full Stack' },
     { id: 'frontend', label: 'Frontend' },
-    { id: 'backend', label: 'Backend' },
-    { id: 'fullstack', label: 'Full Stack' }
+    { id: 'game', label: 'Game Dev' },
+    { id: 'infrastructure', label: 'Infrastructure' },
+    { id: 'documentation', label: 'Documentation' }
   ];
 
   useEffect(() => {

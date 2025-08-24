@@ -181,6 +181,10 @@ section {
   transition: var(--transition);
   position: relative;
   min-width: 150px;
+  overflow: hidden;
+  background-clip: padding-box;
+  backface-visibility: hidden;
+  transform: translateZ(0);
 }
 
 .btn-primary {
