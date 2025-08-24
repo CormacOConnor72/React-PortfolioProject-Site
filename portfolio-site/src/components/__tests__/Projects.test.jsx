@@ -16,18 +16,23 @@ describe('Projects Component', () => {
     render(<Projects />)
     
     expect(screen.getByText('All Projects')).toBeInTheDocument()
-    expect(screen.getByText('Frontend')).toBeInTheDocument()
-    expect(screen.getByText('Backend')).toBeInTheDocument()
     expect(screen.getByText('Full Stack')).toBeInTheDocument()
+    expect(screen.getByText('Frontend')).toBeInTheDocument()
+    expect(screen.getByText('Game Dev')).toBeInTheDocument()
+    expect(screen.getByText('Infrastructure')).toBeInTheDocument()
+    
+    // Use a more specific selector for Documentation button
+    const documentationButton = screen.getByRole('button', { name: 'Documentation' })
+    expect(documentationButton).toBeInTheDocument()
   })
 
   it('shows all projects by default', () => {
     render(<Projects />)
     
     // Should show projects from all categories
-    expect(screen.getByText('E-Commerce Platform')).toBeInTheDocument()
-    expect(screen.getByText('Task Management App')).toBeInTheDocument()
-    expect(screen.getByText('REST API Server')).toBeInTheDocument()
+    expect(screen.getByText('Grid Runners')).toBeInTheDocument()
+    expect(screen.getByText('Flask AI Sentiment Site')).toBeInTheDocument()
+    expect(screen.getByText('WpEngine Customer Portal')).toBeInTheDocument()
   })
 
   it('filters projects when filter button is clicked', async () => {
@@ -39,8 +44,8 @@ describe('Projects Component', () => {
     await user.click(frontendButton)
     
     // Should show only frontend projects
-    expect(screen.getByText('Task Management App')).toBeInTheDocument()
-    expect(screen.queryByText('REST API Server')).not.toBeInTheDocument()
+    expect(screen.getByText('Portfolio Website')).toBeInTheDocument()
+    expect(screen.queryByText('Grid Runners')).not.toBeInTheDocument()
   })
 
   it('updates active filter button styling', async () => {
@@ -65,12 +70,12 @@ describe('Projects Component', () => {
     render(<Projects />)
     
     // Check first project card
-    expect(screen.getByText('E-Commerce Platform')).toBeInTheDocument()
-    expect(screen.getByText(/full-stack e-commerce solution/i)).toBeInTheDocument()
+    expect(screen.getByText('Grid Runners')).toBeInTheDocument()
+    expect(screen.getByText(/first-person shooter game/i)).toBeInTheDocument()
     
     // Check for technology tags that actually exist in the projects
+    expect(screen.getAllByText('Unity').length).toBeGreaterThan(0)
     expect(screen.getAllByText('React').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('Ruby on Rails').length).toBeGreaterThan(0)
   })
 
   it('shows featured badge for featured projects', () => {
@@ -85,23 +90,24 @@ describe('Projects Component', () => {
   it('renders project links', () => {
     render(<Projects />)
     
-    // Should have links to live demo and GitHub
-    const liveLinks = screen.getAllByText('Live Demo')
+    // Should have GitHub links for projects that have them
     const githubLinks = screen.getAllByText('GitHub')
-    
-    expect(liveLinks.length).toBeGreaterThan(0)
     expect(githubLinks.length).toBeGreaterThan(0)
+    
+    // Check that project links container exists
+    const projectLinks = document.querySelectorAll('.project-links')
+    expect(projectLinks.length).toBeGreaterThan(0)
   })
 
   it('handles empty filter results', async () => {
     const user = userEvent.setup()
     render(<Projects />)
     
-    // Click backend filter (assuming there might be fewer backend projects)
-    const backendButton = screen.getByText('Backend')
-    await user.click(backendButton)
+    // Click documentation filter (assuming there might be fewer documentation projects)
+    const documentationButton = screen.getByRole('button', { name: 'Documentation' })
+    await user.click(documentationButton)
     
-    // Should show at least the REST API project or handle empty state
+    // Should show at least the ISO27001 project or handle empty state
     expect(document.querySelectorAll('.project-card').length).toBeGreaterThanOrEqual(0)
   })
 
