@@ -15,21 +15,68 @@ This guide provides comprehensive Infrastructure as Code (IAC) solutions for dep
 
 ## 1. AWS CDK Implementation (Recommended)
 
+**What is AWS CDK?**  
+AWS Cloud Development Kit (CDK) is a framework that allows you to define cloud infrastructure using familiar programming languages like TypeScript. It provides high-level constructs that encapsulate AWS best practices and automatically generates CloudFormation templates.
+
+**Why CDK for this project?**  
+- Type safety and IDE support with TypeScript
+- Reusable constructs and logical abstractions
+- Easy testing and validation
+- Familiar programming patterns
+- Automatic resource dependency management
+
 ### Architecture Overview
+This CDK implementation creates a modern, scalable static website hosting solution:
+
 ```
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
 │   CloudFront    │───▶│    S3 Bucket     │    │   Route 53      │
 │   Distribution  │    │  (Website Host)  │    │  (DNS Domain)   │
+│   (Global CDN)  │    │   (Private)      │    │   (Optional)    │
 └─────────────────┘    └──────────────────┘    └─────────────────┘
          │                        │                       │
          ▼                        ▼                       ▼
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
 │  SSL/TLS Cert   │    │    S3 Bucket     │    │   CloudWatch    │
-│  (ACM)          │    │   (Logs/Backup)  │    │   (Monitoring)  │
+│  (ACM)          │    │   (Access Logs)  │    │   (Monitoring)  │
+│  (Free)         │    │   (90d retention)│    │   (Dashboards)  │
 └─────────────────┘    └──────────────────┘    └─────────────────┘
 ```
 
+**Key Components:**
+- **S3 Bucket**: Hosts your React build files (private, accessed via CloudFront only)
+- **CloudFront**: Global CDN for fast content delivery and HTTPS termination
+- **Route53**: DNS management (optional, only if you have a custom domain)
+- **ACM Certificate**: Free SSL/TLS certificate for HTTPS
+- **IAM Role**: Secure GitHub Actions deployment without storing AWS keys
+- **CloudWatch**: Monitoring, logging, and alerting
+
 ### CDK Project Structure
+
+**File Organization:** This structure follows CDK best practices with separation of concerns:
+
+```
+infrastructure/                 # Root CDK project directory
+├── cdk.json                   # CDK configuration and feature flags  
+├── package.json               # Node.js dependencies and scripts
+├── tsconfig.json             # TypeScript compiler configuration
+├── bin/                      # CDK app entry point
+│   └── portfolio-infrastructure.ts  # Main app file that instantiates stacks
+├── lib/                      # Infrastructure code (the actual CDK constructs)
+│   ├── portfolio-infrastructure-stack.ts  # Main stack definition
+│   ├── constructs/           # Reusable custom constructs (optional)
+│   │   ├── static-website.ts # Custom construct for static site hosting
+│   │   ├── cdn.ts           # CloudFront-specific logic
+│   │   └── monitoring.ts    # CloudWatch dashboards and alarms
+└── test/                    # Unit tests for your infrastructure
+    └── portfolio-infrastructure.test.ts
+```
+
+**Why this structure?**
+- `bin/` contains the app entry point - defines which stacks to deploy
+- `lib/` contains the actual infrastructure definitions
+- `constructs/` allows you to create reusable components
+- `test/` enables infrastructure testing to catch issues early
 ```
 infrastructure/
 ├── cdk.json
@@ -49,7 +96,18 @@ infrastructure/
 
 ### Implementation Files
 
-#### `infrastructure/package.json`
+### Implementation Files
+
+#### `infrastructure/package.json` - Project Dependencies and Scripts
+
+**Purpose:** Defines the CDK project dependencies, scripts, and metadata. This is like package.json for any Node.js project but specifically configured for AWS CDK.
+
+**Key Dependencies Explained:**
+- `aws-cdk-lib`: The main CDK library containing all AWS service constructs
+- `constructs`: Base classes for all CDK constructs
+- `aws-cdk`: The CLI tool for deploying and managing CDK apps
+- `typescript`: Enables type safety and modern JavaScript features
+
 ```json
 {
   "name": "portfolio-infrastructure",
@@ -80,46 +138,83 @@ infrastructure/
 }
 ```
 
-#### `infrastructure/bin/portfolio-infrastructure.ts`
+#### `infrastructure/bin/portfolio-infrastructure.ts` - CDK App Entry Point
+
+**Purpose:** This is the main entry point for your CDK application. It's like the `main()` function - it creates the CDK app and instantiates your stacks.
+
+**What this file does:**
+1. Creates a new CDK App instance
+2. Sets up the AWS environment (account and region)
+3. Instantiates your infrastructure stack
+4. Applies consistent tags to all resources
+5. Synthesizes the CloudFormation template
+
+**Key Concepts:**
+- `env`: Specifies which AWS account/region to deploy to
+- `stackName`: The CloudFormation stack name that will appear in AWS Console
+- `tags`: Applied to all resources for billing, organization, and governance
+- `app.synth()`: Generates the CloudFormation templates
+
 ```typescript
 #!/usr/bin/env node
-import 'source-map-support/register';
+import 'source-map-support/register';  // Better error stack traces
 import * as cdk from 'aws-cdk-lib';
 import { PortfolioInfrastructureStack } from '../lib/portfolio-infrastructure-stack';
 
+// Create the CDK application
 const app = new cdk.App();
 
+// Environment configuration - uses CDK CLI defaults or environment variables
 const env = {
-  account: process.env.CDK_DEFAULT_ACCOUNT,
-  region: process.env.CDK_DEFAULT_REGION,
+  account: process.env.CDK_DEFAULT_ACCOUNT,  // Your AWS account ID
+  region: process.env.CDK_DEFAULT_REGION,    // AWS region (e.g., us-east-1)
 };
 
+// Create the infrastructure stack with configuration
 new PortfolioInfrastructureStack(app, 'PortfolioInfrastructureStack', {
   env,
-  stackName: 'portfolio-site-infrastructure',
+  stackName: 'portfolio-site-infrastructure',  // Name in CloudFormation console
   tags: {
-    Project: 'PortfolioSite',
-    Environment: 'production',
-    Owner: 'CormacOConnor'
+    Project: 'PortfolioSite',      // For cost tracking and organization
+    Environment: 'production',      // Distinguishes prod/staging/dev
+    Owner: 'CormacOConnor'         // Resource ownership
   }
 });
 
+// Generate CloudFormation templates
 app.synth();
 ```
 
-#### `infrastructure/lib/portfolio-infrastructure-stack.ts`
+#### `infrastructure/lib/portfolio-infrastructure-stack.ts` - Main Infrastructure Definition
+
+**Purpose:** This is the heart of your infrastructure - it defines all AWS resources needed to host your React portfolio site. Think of it as a blueprint that describes your entire cloud architecture.
+
+**What this stack creates:**
+1. **S3 Buckets**: One for hosting, one for access logs
+2. **CloudFront Distribution**: Global CDN with caching rules
+3. **SSL Certificate**: Free HTTPS certificate via ACM
+4. **DNS Records**: Route53 records (if domain provided)
+5. **IAM Role**: Secure access for GitHub Actions
+6. **Monitoring**: CloudWatch dashboards and alarms
+
+**Security Features:**
+- S3 bucket is private (no public access)
+- CloudFront uses Origin Access Control (OAC) for secure S3 access
+- IAM role uses least-privilege permissions
+- All data encrypted at rest and in transit
+
 ```typescript
-import * as cdk from 'aws-cdk-lib';
-import * as s3 from 'aws-cdk-lib/aws-s3';
-import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
-import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
-import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
-import * as acm from 'aws-cdk-lib/aws-certificatemanager';
-import * as route53 from 'aws-cdk-lib/aws-route53';
-import * as targets from 'aws-cdk-lib/aws-route53-targets';
-import * as iam from 'aws-cdk-lib/aws-iam';
-import * as cloudwatch from 'aws-cdk-lib/aws-cloudwatch';
-import { Construct } from 'constructs';
+import * as cdk from 'aws-cdk-lib';                    // Core CDK constructs
+import * as s3 from 'aws-cdk-lib/aws-s3';             // S3 bucket constructs
+import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';  // S3 deployment utilities
+import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';   // CloudFront CDN constructs
+import * as origins from 'aws-cdk-lib/aws-cloudfront-origins'; // CloudFront origins
+import * as acm from 'aws-cdk-lib/aws-certificatemanager';     // SSL certificates
+import * as route53 from 'aws-cdk-lib/aws-route53';           // DNS management
+import * as targets from 'aws-cdk-lib/aws-route53-targets';    // Route53 targets
+import * as iam from 'aws-cdk-lib/aws-iam';                   // IAM roles and policies
+import * as cloudwatch from 'aws-cdk-lib/aws-cloudwatch';     // Monitoring and alerting
+import { Construct } from 'constructs';                       // Base construct class
 
 export interface PortfolioInfrastructureStackProps extends cdk.StackProps {
   domainName?: string;
@@ -443,106 +538,163 @@ npx cdk destroy
 
 ## 2. CloudFormation Implementation
 
-### CloudFormation Template: `cloudformation/portfolio-infrastructure.yaml`
-```yaml
-AWSTemplateFormatVersion: '2010-09-09'
-Description: 'Static React Portfolio Site Infrastructure'
+**What is CloudFormation?**  
+AWS CloudFormation is AWS's native Infrastructure as Code service that uses JSON or YAML templates to define and provision AWS resources. It's declarative - you describe what you want, and CloudFormation figures out how to create it.
 
+**Why CloudFormation for this project?**
+- Native AWS service with deep integration
+- No additional tools or dependencies required
+- Automatic rollback on failures
+- Stack-based resource management
+- Built-in drift detection
+- Free to use (you only pay for the resources it creates)
+
+**Key CloudFormation Concepts:**
+- **Template**: YAML/JSON file defining your infrastructure
+- **Stack**: A deployed instance of a template
+- **Parameters**: Input values to customize deployments
+- **Conditions**: Logical operators for conditional resource creation
+- **Outputs**: Values exported from the stack for use elsewhere
+
+### CloudFormation Template: `cloudformation/portfolio-infrastructure.yaml`
+
+**Purpose:** This template creates the complete infrastructure for hosting your React portfolio site. It's a declarative blueprint that CloudFormation uses to create, update, and delete resources as a single unit.
+
+**Template Structure Explained:**
+- **AWSTemplateFormatVersion**: Specifies the CloudFormation template format version
+- **Description**: Human-readable description of what this template does
+- **Parameters**: Configurable inputs (domain name, GitHub repo, environment)
+- **Conditions**: Logic for optional resources (like custom domain setup)
+- **Resources**: The actual AWS services to be created
+- **Outputs**: Important values to be returned after deployment
+
+```yaml
+AWSTemplateFormatVersion: '2010-09-09'  # CloudFormation template version
+Description: 'Static React Portfolio Site Infrastructure - Complete hosting solution with CDN, SSL, and CI/CD integration'
+
+# Input parameters allow customization without modifying the template
 Parameters:
   DomainName:
     Type: String
-    Description: 'Domain name for the website (optional)'
+    Description: 'Custom domain name (e.g., mysite.com). Leave empty to use CloudFront domain'
     Default: ''
+    # If empty, the site will be accessible via CloudFront's generated domain
   
   GitHubRepo:
     Type: String
-    Description: 'GitHub repository in format username/repo-name'
+    Description: 'GitHub repository in format username/repo-name for CI/CD permissions'
     Default: 'YourUsername/React PortfolioProject Site'
+    # Used to configure OIDC trust relationship for secure deployments
   
   Environment:
     Type: String
-    Description: 'Environment name'
+    Description: 'Environment name for resource naming and configuration'
     Default: 'production'
-    AllowedValues:
-      - production
-      - staging
-      - development
+    AllowedValues:  # Restricts input to valid environment names
+      - production  # Full monitoring and production-grade settings
+      - staging     # Testing environment with reduced monitoring
+      - development # Development environment with minimal monitoring
 
+# Conditions enable conditional resource creation based on parameters
 Conditions:
-  HasDomainName: !Not [!Equals [!Ref DomainName, '']]
-  IsProduction: !Equals [!Ref Environment, 'production']
+  HasDomainName: !Not [!Equals [!Ref DomainName, '']]  # True if custom domain provided
+  IsProduction: !Equals [!Ref Environment, 'production']  # True for production environment
+  # These conditions control whether to create SSL certificates, DNS records, and monitoring
 
 Resources:
-  # S3 Bucket for website hosting
+  # ===== S3 BUCKET FOR WEBSITE HOSTING =====
+  # This bucket stores your React app build files (HTML, CSS, JS, assets)
   WebsiteBucket:
     Type: AWS::S3::Bucket
     Properties:
+      # Unique bucket name using account ID and region to avoid conflicts
       BucketName: !Sub 'portfolio-site-${AWS::AccountId}-${AWS::Region}'
+      
+      # Website configuration for SPA routing
       WebsiteConfiguration:
-        IndexDocument: index.html
-        ErrorDocument: index.html
+        IndexDocument: index.html    # Default document served
+        ErrorDocument: index.html    # SPA routing - all 404s serve index.html
+      
+      # Security: Block ALL public access (CloudFront will access via OAC)
       PublicAccessBlockConfiguration:
-        BlockPublicAcls: true
-        BlockPublicPolicy: true
-        IgnorePublicAcls: true
-        RestrictPublicBuckets: true
+        BlockPublicAcls: true          # Block public ACLs
+        BlockPublicPolicy: true        # Block public bucket policies
+        IgnorePublicAcls: true         # Ignore existing public ACLs
+        RestrictPublicBuckets: true    # Restrict public bucket policies
+      
+      # Encryption: All objects encrypted at rest
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
-              SSEAlgorithm: AES256
+              SSEAlgorithm: AES256     # AWS-managed encryption (free)
+      
+      # Lifecycle: Clean up incomplete uploads to save costs
       LifecycleConfiguration:
         Rules:
           - Id: DeleteIncompleteMultipartUploads
             Status: Enabled
             AbortIncompleteMultipartUpload:
-              DaysAfterInitiation: 1
+              DaysAfterInitiation: 1   # Delete after 1 day
+      
+      # Tags for organization and cost tracking
       Tags:
         - Key: Project
           Value: PortfolioSite
         - Key: Environment
-          Value: !Ref Environment
+          Value: !Ref Environment       # production/staging/development
 
-  # S3 Bucket for CloudFront access logs
+  # ===== S3 BUCKET FOR ACCESS LOGS =====
+  # Separate bucket to store CloudFront access logs for analytics and debugging
   LogsBucket:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Sub 'portfolio-site-logs-${AWS::AccountId}-${AWS::Region}'
+      
+      # Security: Block public access to log files
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
         BlockPublicPolicy: true
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
+      
+      # Cost optimization: Automatically delete old logs
       LifecycleConfiguration:
         Rules:
           - Id: DeleteOldLogs
             Status: Enabled
-            ExpirationInDays: 90
+            ExpirationInDays: 90        # Keep logs for 90 days then delete
+      
       Tags:
         - Key: Project
           Value: PortfolioSite
         - Key: Environment
           Value: !Ref Environment
 
-  # Origin Access Control
+  # ===== ORIGIN ACCESS CONTROL (OAC) =====
+  # Secure mechanism for CloudFront to access private S3 bucket
+  # Replaces the deprecated Origin Access Identity (OAI)
   OriginAccessControl:
     Type: AWS::CloudFront::OriginAccessControl
     Properties:
       OriginAccessControlConfig:
-        Name: !Sub '${AWS::StackName}-OAC'
-        OriginAccessControlOriginType: s3
-        SigningBehavior: always
-        SigningProtocol: sigv4
-        Description: 'OAC for Portfolio Site'
+        Name: !Sub '${AWS::StackName}-OAC'     # Descriptive name
+        OriginAccessControlOriginType: s3       # For S3 origins
+        SigningBehavior: always                 # Always sign requests
+        SigningProtocol: sigv4                  # Use AWS Signature Version 4
+        Description: 'Secure access from CloudFront to S3 bucket'
 
-  # SSL Certificate (conditional)
+  # ===== SSL/TLS CERTIFICATE (OPTIONAL) =====
+  # Free SSL certificate from AWS Certificate Manager
+  # Only created if a custom domain name is provided
   SSLCertificate:
     Type: AWS::CertificateManager::Certificate
-    Condition: HasDomainName
+    Condition: HasDomainName                    # Only create if domain provided
     Properties:
-      DomainName: !Ref DomainName
-      SubjectAlternativeNames:
-        - !Sub 'www.${DomainName}'
-      ValidationMethod: DNS
+      DomainName: !Ref DomainName              # Primary domain (e.g., example.com)
+      SubjectAlternativeNames:                 # Additional domains covered
+        - !Sub 'www.${DomainName}'             # www subdomain (e.g., www.example.com)
+      ValidationMethod: DNS                     # Validate via DNS records (automatic)
+      # Note: Certificate must be in us-east-1 region for CloudFront
       Tags:
         - Key: Project
           Value: PortfolioSite
@@ -861,103 +1013,177 @@ aws cloudformation describe-stacks \
 
 ## 3. Terraform Implementation
 
+**What is Terraform?**  
+Terraform is an open-source Infrastructure as Code tool by HashiCorp that allows you to define and provision cloud infrastructure using declarative configuration files. It uses HashiCorp Configuration Language (HCL) and supports multiple cloud providers.
+
+**Why Terraform for this project?**
+- Industry standard for Infrastructure as Code
+- Multi-cloud support (not locked to AWS)
+- Rich ecosystem and community
+- Powerful state management
+- Plan/apply workflow shows changes before execution
+- Module system for reusable components
+- Extensive provider ecosystem
+
+**Key Terraform Concepts:**
+- **Resources**: Individual infrastructure components (S3 bucket, CloudFront distribution)
+- **Providers**: Plugins that interact with cloud APIs (AWS, Azure, GCP)
+- **State**: Terraform's record of your infrastructure
+- **Modules**: Reusable collections of resources
+- **Variables**: Input parameters for configuration
+- **Outputs**: Values exported from Terraform configurations
+
 ### Terraform Project Structure
+
+**File Organization:** This structure follows Terraform best practices with clear separation of concerns and environment-specific configurations:
+
 ```
-terraform/
-├── main.tf
-├── variables.tf
-├── outputs.tf
-├── providers.tf
-├── modules/
-│   ├── s3-website/
-│   │   ├── main.tf
-│   │   ├── variables.tf
-│   │   └── outputs.tf
-│   ├── cloudfront/
-│   │   ├── main.tf
-│   │   ├── variables.tf
-│   │   └── outputs.tf
-│   └── route53/
-│       ├── main.tf
-│       ├── variables.tf
-│       └── outputs.tf
-├── environments/
-│   ├── production/
-│   │   ├── terraform.tfvars
-│   │   └── backend.tf
-│   └── staging/
-│       ├── terraform.tfvars
-│       └── backend.tf
-└── scripts/
-    ├── deploy.sh
-    └── destroy.sh
+terraform/                          # Root Terraform project directory
+├── main.tf                         # Primary resource definitions
+├── variables.tf                    # Input variable declarations
+├── outputs.tf                      # Output value definitions
+├── providers.tf                    # Provider configurations and versions
+├── modules/                        # Reusable Terraform modules (optional)
+│   ├── s3-website/                # S3 static website hosting module
+│   │   ├── main.tf                # S3 bucket and website configuration
+│   │   ├── variables.tf           # Module input variables
+│   │   └── outputs.tf             # Module output values
+│   ├── cloudfront/                # CloudFront CDN module
+│   │   ├── main.tf                # Distribution and caching rules
+│   │   ├── variables.tf           # CloudFront-specific variables
+│   │   └── outputs.tf             # Distribution ID, domain name, etc.
+│   └── route53/                   # DNS management module
+│       ├── main.tf                # DNS records and hosted zone
+│       ├── variables.tf           # Domain and DNS variables
+│       └── outputs.tf             # DNS-related outputs
+├── environments/                   # Environment-specific configurations
+│   ├── production/                # Production environment
+│   │   ├── terraform.tfvars       # Production variable values
+│   │   └── backend.tf             # Production state backend config
+│   └── staging/                   # Staging environment
+│       ├── terraform.tfvars       # Staging variable values
+│       └── backend.tf             # Staging state backend config
+└── scripts/                       # Deployment automation scripts
+    ├── deploy.sh                  # Automated deployment script
+    └── destroy.sh                 # Automated destruction script
 ```
 
-#### `terraform/providers.tf`
+**Why this structure?**
+- **Root files**: Core infrastructure definition and configuration
+- **modules/**: Reusable components that can be shared across projects
+- **environments/**: Separate configurations for different deployment environments
+- **scripts/**: Automation for common operations
+- **State isolation**: Each environment has its own state file for safety
+
+### Implementation Files
+
+#### `terraform/providers.tf` - Provider Configuration and Versions
+
+**Purpose:** This file configures which cloud providers Terraform will use and their versions. It's like the "imports" section of a programming language - it tells Terraform which APIs it can use.
+
+**Key Components:**
+- **required_version**: Minimum Terraform version needed
+- **required_providers**: Cloud provider plugins and their versions
+- **provider blocks**: Configuration for each provider
+- **default_tags**: Tags applied to all resources automatically
+
+**Provider Versioning:** Using `~> 5.0` means "use version 5.x but not 6.0" - this allows minor updates while preventing breaking changes.
+
 ```hcl
 terraform {
-  required_version = ">= 1.0"
+  required_version = ">= 1.0"              # Minimum Terraform CLI version
   
   required_providers {
     aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
+      source  = "hashicorp/aws"             # Official AWS provider
+      version = "~> 5.0"                    # Use AWS provider version 5.x
     }
     random = {
-      source  = "hashicorp/random"
-      version = "~> 3.1"
+      source  = "hashicorp/random"          # For generating unique names
+      version = "~> 3.1"                    # Random resource provider
     }
   }
 }
 
+# ===== AWS PROVIDER CONFIGURATION =====
+# Main AWS provider for resources in the specified region
 provider "aws" {
-  region = var.aws_region
+  region = var.aws_region                   # Deploy resources in this region
 
+  # Default tags applied to ALL resources created by this provider
   default_tags {
     tags = {
-      Project     = "PortfolioSite"
-      Environment = var.environment
-      ManagedBy   = "Terraform"
-      Owner       = "CormacOConnor"
+      Project     = "PortfolioSite"         # For cost tracking and organization
+      Environment = var.environment         # production/staging/development
+      ManagedBy   = "Terraform"            # Identifies infrastructure tool used
+      Owner       = "CormacOConnor"         # Resource ownership
     }
   }
 }
 
+# ===== SECONDARY AWS PROVIDER FOR US-EAST-1 =====
+# CloudFront requires SSL certificates to be in us-east-1 region
+# This provider ensures ACM certificates are created in the correct region
 provider "aws" {
-  alias  = "us-east-1"
-  region = "us-east-1" # Required for ACM certificates used with CloudFront
+  alias  = "us-east-1"                     # Named alias for this provider
+  region = "us-east-1"                     # Fixed region for CloudFront compatibility
+  # Note: ACM certificates for CloudFront must be in us-east-1 regardless of
+  # where other resources are deployed
 }
 ```
 
-#### `terraform/variables.tf`
+#### `terraform/variables.tf` - Input Variable Definitions
+
+**Purpose:** This file defines all the configurable inputs for your Terraform configuration. Variables make your infrastructure reusable across different environments and customizable for different use cases.
+
+**Variable Types:**
+- **string**: Text values (domain names, regions)
+- **number**: Numeric values (retention days, counts)
+- **bool**: True/false values (enable/disable features)
+- **list**: Arrays of values
+- **validation blocks**: Ensure input values meet requirements
+
+**How variables work:**
+1. Define the variable in `variables.tf`
+2. Set values in `terraform.tfvars` or pass via CLI
+3. Reference in resources using `var.variable_name`
+
 ```hcl
+# ===== CORE AWS CONFIGURATION =====
 variable "aws_region" {
-  description = "AWS region for resources"
+  description = "AWS region where resources will be deployed"
   type        = string
-  default     = "us-east-1"
+  default     = "us-east-1"                 # Default to US East (cheapest for CloudFront)
 }
 
 variable "environment" {
-  description = "Environment name"
+  description = "Environment name for resource naming and configuration"
   type        = string
   default     = "production"
   
+  # Validation ensures only valid environment names are accepted
   validation {
     condition     = contains(["production", "staging", "development"], var.environment)
     error_message = "Environment must be one of: production, staging, development."
   }
+  # This prevents typos and ensures consistent environment naming
 }
 
+# ===== WEBSITE CONFIGURATION =====
 variable "domain_name" {
-  description = "Domain name for the website (optional)"
+  description = "Custom domain name for the website (optional). Leave empty to use CloudFront domain"
   type        = string
-  default     = ""
+  default     = ""                          # Empty means no custom domain
+  # If provided, creates SSL certificate and DNS records
+  # If empty, site accessible via CloudFront's auto-generated domain
 }
 
+# ===== CI/CD CONFIGURATION =====
 variable "github_repo" {
-  description = "GitHub repository in format username/repo-name"
+  description = "GitHub repository in format username/repo-name for OIDC integration"
   type        = string
   default     = "YourUsername/React PortfolioProject Site"
+  # Used to configure IAM role trust policy for secure GitHub Actions deployment
 }
 
 variable "enable_monitoring" {
@@ -987,50 +1213,84 @@ variable "log_retention_days" {
   default     = 90
 }
 
+# ===== LOCAL VALUES =====
+# Computed values used throughout the configuration
 locals {
+  # Unique bucket names using random suffix to avoid global conflicts
   bucket_name      = "portfolio-site-${random_id.bucket_suffix.hex}"
   logs_bucket_name = "portfolio-site-logs-${random_id.bucket_suffix.hex}"
-  has_domain       = var.domain_name != ""
   
+  # Boolean flag for conditional resource creation
+  has_domain       = var.domain_name != ""        # True if custom domain provided
+  
+  # Common tags applied to resources that don't use provider default_tags
   common_tags = {
     Project     = "PortfolioSite"
     Environment = var.environment
     ManagedBy   = "Terraform"
   }
+  # Note: Most resources use provider default_tags, these are for exceptions
 }
 ```
 
-#### `terraform/main.tf`
+#### `terraform/main.tf` - Main Resource Definitions
+
+**Purpose:** This is the heart of your Terraform configuration where you define all the AWS resources needed for your portfolio site. Each resource block creates one AWS service component.
+
+**Resource Organization:**
+1. **Utility resources**: Random IDs, data sources
+2. **Storage**: S3 buckets for hosting and logs
+3. **Security**: SSL certificates and access controls
+4. **CDN**: CloudFront distribution and caching
+5. **DNS**: Route53 records (if custom domain)
+6. **IAM**: Roles for GitHub Actions
+7. **Monitoring**: CloudWatch dashboards and alarms
+
 ```hcl
-# Random ID for unique bucket names
+# ===== UTILITY RESOURCES =====
+# Generate random suffix to ensure globally unique S3 bucket names
 resource "random_id" "bucket_suffix" {
-  byte_length = 4
+  byte_length = 4                           # Creates 8-character hex string
+  # S3 bucket names must be globally unique across all AWS accounts
+  # This random suffix prevents naming conflicts
 }
 
-# S3 bucket for website hosting
+# ===== S3 WEBSITE HOSTING BUCKET =====
+# Primary bucket that stores your React application files
 resource "aws_s3_bucket" "website" {
-  bucket = local.bucket_name
+  bucket = local.bucket_name                # Uses local value with random suffix
+  # This bucket will contain: index.html, CSS, JS, images, and other assets
 }
 
+# Configure the S3 bucket for static website hosting
 resource "aws_s3_bucket_website_configuration" "website" {
   bucket = aws_s3_bucket.website.id
 
+  # Default document served for requests to the root
   index_document {
-    suffix = "index.html"
+    suffix = "index.html"                   # Serves index.html for / requests
   }
 
+  # Error document for 404s - enables SPA routing
   error_document {
-    key = "index.html" # SPA routing
+    key = "index.html"                      # All 404s serve index.html
+    # This allows React Router to handle client-side routing
+    # Users can bookmark /about and it will load correctly
   }
 }
 
+# Security: Block all public access to the website bucket
 resource "aws_s3_bucket_public_access_block" "website" {
   bucket = aws_s3_bucket.website.id
 
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
+  # Comprehensive public access blocking for security
+  block_public_acls       = true            # Block public ACL creation
+  block_public_policy     = true            # Block public bucket policies
+  ignore_public_acls      = true            # Ignore existing public ACLs
+  restrict_public_buckets = true            # Restrict public bucket policies
+  
+  # This ensures the bucket is private - only CloudFront can access it
+  # Public access is handled securely through CloudFront distribution
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "website" {
@@ -1566,51 +1826,100 @@ fi
 
 ## 4. Enhanced GitHub Actions Workflows
 
-### Updated GitHub Actions Workflow: `.github/workflows/deploy.yml`
-```yaml
-name: Deploy React Portfolio Site
+**What are GitHub Actions?**  
+GitHub Actions is a CI/CD platform that automates your software development workflows. It allows you to build, test, and deploy your code directly from your GitHub repository using YAML configuration files.
 
+**Why GitHub Actions for this project?**
+- Native integration with GitHub repositories
+- Free tier includes 2,000 minutes per month
+- Secure secret management
+- OIDC integration for keyless AWS authentication
+- Rich ecosystem of pre-built actions
+- Matrix builds for testing multiple environments
+
+**Key Concepts:**
+- **Workflow**: Automated process defined in YAML
+- **Job**: Group of steps that execute on the same runner
+- **Step**: Individual task within a job
+- **Action**: Reusable unit of code
+- **Runner**: Virtual machine that executes jobs
+- **Secrets**: Encrypted environment variables
+
+### Updated GitHub Actions Workflow: `.github/workflows/deploy.yml`
+
+**Purpose:** This workflow automates the entire deployment process from code commit to live website. It implements a production-grade CI/CD pipeline with testing, building, and deployment stages.
+
+**Workflow Stages:**
+1. **Test**: Runs linting and tests to ensure code quality
+2. **Build**: Compiles React app and generates production assets
+3. **Deploy**: Uploads to S3 and invalidates CloudFront cache
+4. **Notify**: Sends deployment status and summary
+
+**Security Features:**
+- OIDC authentication (no long-lived AWS keys)
+- Environment protection rules
+- Least-privilege IAM permissions
+- Secret management for sensitive values
+
+```yaml
+name: Deploy React Portfolio Site    # Workflow name shown in GitHub UI
+
+# ===== WORKFLOW TRIGGERS =====
+# When should this workflow run?
 on:
   push:
-    branches: [ main ]
+    branches: [ main ]              # Deploy on pushes to main branch
   pull_request:
-    branches: [ main ]
+    branches: [ main ]              # Test on pull requests to main
+  # Note: Deploy job only runs on pushes to main (see condition below)
 
+# ===== GLOBAL ENVIRONMENT VARIABLES =====
+# Available to all jobs in this workflow
 env:
-  NODE_VERSION: '18'
-  AWS_REGION: 'us-east-1'
+  NODE_VERSION: '18'                # Node.js version for consistent builds
+  AWS_REGION: 'us-east-1'           # AWS region for deployments
 
+# ===== JOBS DEFINITION =====
 jobs:
+  # ===== TEST JOB =====
+  # Runs code quality checks and tests
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest          # GitHub-hosted runner
     steps:
+      # Download the repository code
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4    # Official GitHub action
       
+      # Setup Node.js environment with caching for faster builds
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v4  # Official Node.js setup action
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: portfolio-site/package-lock.json
+          node-version: ${{ env.NODE_VERSION }}    # Use global env var
+          cache: 'npm'                              # Cache npm dependencies
+          cache-dependency-path: portfolio-site/package-lock.json  # Cache key
       
+      # Install dependencies (npm ci is faster and more reliable than npm install)
       - name: Install dependencies
-        run: npm ci
+        run: npm ci                  # Clean install from package-lock.json
         working-directory: ./portfolio-site
       
+      # Check code quality with ESLint
       - name: Run linting
-        run: npm run lint
+        run: npm run lint            # Runs ESLint to catch code issues
         working-directory: ./portfolio-site
       
+      # Run unit and integration tests
       - name: Run tests
-        run: npm run test:run
+        run: npm run test:run        # Runs tests once (not watch mode)
         working-directory: ./portfolio-site
 
+  # ===== BUILD JOB =====
+  # Compiles the React application for production
   build:
-    needs: test
+    needs: test                     # Only run if test job passes
     runs-on: ubuntu-latest
     outputs:
-      build-hash: ${{ steps.hash.outputs.hash }}
+      build-hash: ${{ steps.hash.outputs.hash }}  # Pass build hash to deploy job
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -1626,35 +1935,43 @@ jobs:
         run: npm ci
         working-directory: ./portfolio-site
       
+      # Build the React application for production
       - name: Build application
-        run: npm run build
+        run: npm run build           # Runs Vite build process
         working-directory: ./portfolio-site
         env:
-          CI: false
+          CI: false                 # Prevents warnings from failing build
       
+      # Generate unique hash of build files for cache busting
       - name: Generate build hash
-        id: hash
+        id: hash                    # ID allows other steps to reference outputs
         run: |
           BUILD_HASH=$(find portfolio-site/dist -type f -exec sha256sum {} \; | sha256sum | cut -d' ' -f1 | cut -c1-8)
           echo "hash=$BUILD_HASH" >> $GITHUB_OUTPUT
           echo "Build hash: $BUILD_HASH"
+          # This creates a unique identifier for each build
       
+      # Store build artifacts for the deploy job
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-files-${{ steps.hash.outputs.hash }}
-          path: portfolio-site/dist/
-          retention-days: 1
+          name: build-files-${{ steps.hash.outputs.hash }}  # Unique artifact name
+          path: portfolio-site/dist/                         # Built files
+          retention-days: 1                                  # Clean up after 1 day
 
+  # ===== DEPLOY JOB =====
+  # Deploys the built application to AWS
   deploy:
+    # Security: Only deploy from main branch pushes (not PRs)
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    needs: [test, build]
+    needs: [test, build]            # Wait for both test and build to succeed
     runs-on: ubuntu-latest
-    environment: production
+    environment: production         # Uses GitHub environment protection
     
+    # OIDC permissions for keyless AWS authentication
     permissions:
-      id-token: write   # Required for OIDC
-      contents: read    # Required for checkout
+      id-token: write               # Required to request OIDC token
+      contents: read                # Required to checkout repository
     
     steps:
       - name: Checkout code
@@ -1666,41 +1983,53 @@ jobs:
           name: build-files-${{ needs.build.outputs.build-hash }}
           path: ./dist
       
+      # ===== SECURE AWS AUTHENTICATION =====
+      # Primary method: OIDC (no long-lived credentials)
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}       # IAM role created by IaC
           aws-region: ${{ env.AWS_REGION }}
-          role-session-name: GitHubActions-${{ github.run_id }}
+          role-session-name: GitHubActions-${{ github.run_id }}  # Unique session name
       
-      # Fallback to access keys if OIDC is not configured
+      # Fallback method: Access keys (less secure, but works if OIDC not set up)
       - name: Configure AWS credentials (Access Keys)
-        if: failure()
+        if: failure()               # Only runs if OIDC authentication fails
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
       
+      # ===== DEPLOY TO S3 =====
+      # Upload build files with optimized caching headers
       - name: Deploy to S3
         run: |
           echo "Deploying to S3 bucket: ${{ secrets.AWS_S3_BUCKET_NAME }}"
+          
+          # Upload static assets with long cache times (1 year)
           aws s3 sync ./dist/ s3://${{ secrets.AWS_S3_BUCKET_NAME }}/ \
             --delete \
             --cache-control max-age=31536000 \
             --exclude "*.html" \
             --exclude "service-worker.js"
+          # CSS, JS, images get long cache times because they have unique names
           
-          # Special cache headers for HTML and service worker
+          # Upload HTML and service worker with no caching
           aws s3 sync ./dist/ s3://${{ secrets.AWS_S3_BUCKET_NAME }}/ \
             --cache-control max-age=0,no-cache,no-store,must-revalidate \
             --include "*.html" \
             --include "service-worker.js"
+          # HTML needs fresh content for updates, service worker controls caching
       
+      # ===== CLOUDFRONT CACHE INVALIDATION =====
+      # Clear CDN cache to serve updated content immediately
       - name: Invalidate CloudFront
-        if: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID != '' }}
+        if: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID != '' }}  # Only if CloudFront exists
         run: |
           echo "Creating CloudFront invalidation for distribution: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}"
+          
+          # Create cache invalidation for all files
           INVALIDATION_ID=$(aws cloudfront create-invalidation \
             --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
             --paths "/*" \
@@ -1709,11 +2038,14 @@ jobs:
           
           echo "Invalidation created with ID: $INVALIDATION_ID"
           echo "Waiting for invalidation to complete..."
+          
+          # Wait for invalidation to complete (can take 5-15 minutes)
           aws cloudfront wait invalidation-completed \
             --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
             --id $INVALIDATION_ID
           
           echo "CloudFront invalidation completed successfully"
+          # Users worldwide will now see the updated content
       
       - name: Health check
         if: ${{ secrets.WEBSITE_URL != '' }}
@@ -1763,52 +2095,76 @@ jobs:
 ```
 
 ### Infrastructure Deployment Workflow: `.github/workflows/infrastructure.yml`
-```yaml
-name: Infrastructure Deployment
 
+**Purpose:** This workflow manages your infrastructure deployments using any of the three IaC tools (CDK, CloudFormation, or Terraform). It's designed for manual triggers with environment selection and action choice.
+
+**Key Features:**
+- **Manual Trigger**: Uses `workflow_dispatch` for controlled deployments
+- **Multi-Tool Support**: Supports CDK, CloudFormation, and Terraform
+- **Environment Isolation**: Separate configurations for production and staging
+- **Action Selection**: Plan, deploy, or destroy infrastructure
+- **Safe Operations**: Requires explicit choices to prevent accidents
+
+**When to use this workflow:**
+- Initial infrastructure setup
+- Infrastructure updates or changes
+- Environment provisioning (staging, production)
+- Disaster recovery (rebuild infrastructure)
+- Cost optimization (destroy staging environments)
+
+```yaml
+name: Infrastructure Deployment   # Shown in GitHub Actions UI
+
+# ===== MANUAL WORKFLOW TRIGGER =====
+# This workflow only runs when manually triggered from GitHub UI
 on:
-  workflow_dispatch:
-    inputs:
+  workflow_dispatch:              # Manual trigger only
+    inputs:                      # User-selectable options
       action:
         description: 'Action to perform'
         required: true
-        default: 'plan'
+        default: 'plan'           # Safe default - just shows changes
         type: choice
         options:
-          - plan
-          - deploy
-          - destroy
+          - plan                  # Show what changes will be made
+          - deploy                # Actually create/update infrastructure
+          - destroy               # Delete infrastructure (be careful!)
       environment:
         description: 'Environment to deploy'
         required: true
         default: 'production'
         type: choice
         options:
-          - production
-          - staging
+          - production            # Live environment
+          - staging               # Testing environment
       tool:
         description: 'IaC Tool to use'
         required: true
-        default: 'terraform'
+        default: 'terraform'     # Default to Terraform
         type: choice
         options:
-          - terraform
-          - cdk
-          - cloudformation
+          - terraform             # HashiCorp Terraform
+          - cdk                   # AWS CDK (TypeScript)
+          - cloudformation        # AWS CloudFormation (YAML)
 
+# ===== SECURITY PERMISSIONS =====
+# Required for OIDC authentication and code access
 permissions:
-  id-token: write   # Required for OIDC
-  contents: read    # Required for checkout
+  id-token: write                 # Request OIDC tokens for AWS authentication
+  contents: read                  # Read repository code and configuration
 
 env:
   AWS_REGION: 'us-east-1'
 
+# ===== INFRASTRUCTURE JOBS =====
 jobs:
+  # ===== TERRAFORM DEPLOYMENT JOB =====
   terraform:
-    if: github.event.inputs.tool == 'terraform'
+    if: github.event.inputs.tool == 'terraform'  # Only run if Terraform selected
     runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.environment }}
+    environment: ${{ github.event.inputs.environment }}  # Use selected environment
     
+    # All commands run in terraform directory by default
     defaults:
       run:
         working-directory: terraform
@@ -1980,11 +2336,41 @@ jobs:
 
 ## 5. Security and Best Practices
 
+**Why Security Matters**  
+Your portfolio site represents your professional brand, and security breaches can damage your reputation and career prospects. Even static sites need security considerations for data integrity, availability, and visitor trust.
+
+**Security Layers in This Architecture:**
+1. **Infrastructure Security**: Private S3 buckets, secure access controls
+2. **Network Security**: HTTPS everywhere, CDN protection
+3. **Access Security**: OIDC authentication, least-privilege IAM
+4. **Data Security**: Encryption at rest and in transit
+5. **Application Security**: Security headers, content validation
+
 ### Security Configurations
 
+**Best Practices Implemented:**
+- All traffic encrypted with TLS 1.2+
+- S3 buckets are private with no public access
+- CloudFront uses Origin Access Control (OAC) for secure S3 access
+- IAM roles follow least-privilege principle
+- Security headers protect against common web attacks
+- Infrastructure as Code ensures consistent security configurations
+
 #### WAF Configuration (Optional Enhancement)
+
+**What is AWS WAF?**  
+AWS Web Application Firewall (WAF) is a security service that protects web applications from common web exploits and bots. While optional for a portfolio site, it adds an extra layer of security.
+
+**When to add WAF:**
+- High-traffic portfolio sites
+- Sites with contact forms or user interactions
+- Professional/corporate requirements
+- Compliance requirements
+
+**Cost consideration:** WAF costs ~$5/month + $1 per million requests.
+
 ```yaml
-# Add to CloudFormation template
+# Add to CloudFormation template - creates basic web protection
 WebApplicationFirewall:
   Type: AWS::WAFv2::WebACL
   Properties:
@@ -2025,7 +2411,20 @@ WebApplicationFirewall:
 
 ### Cost Optimization
 
-#### S3 Lifecycle Policies
+**Why Cost Optimization Matters**  
+While AWS costs for a static site are typically low ($10-20/month), implementing cost optimization practices from the start builds good habits and can save money as your projects scale.
+
+**Cost Optimization Strategies:**
+1. **Storage Optimization**: Lifecycle policies, intelligent tiering
+2. **CDN Optimization**: Regional pricing, compression
+3. **Monitoring**: Billing alerts, cost tracking
+4. **Resource Cleanup**: Automated deletion of old resources
+5. **Right-Sizing**: Choose appropriate service tiers
+
+**Purpose:** Automatically transitions or deletes objects based on age to reduce storage costs. Particularly useful for log files and old asset versions.
+
+**Cost Impact:** Can reduce storage costs by 40-60% for log files and infrequently accessed content.
+
 ```json
 {
   "Rules": [
@@ -2052,7 +2451,29 @@ WebApplicationFirewall:
 
 ### Monitoring and Alerting
 
-#### Enhanced CloudWatch Dashboard
+**Why Monitoring is Essential**  
+Even static sites need monitoring to ensure uptime, performance, and security. Proper monitoring helps you identify issues before users do and provides insights into site usage.
+
+**What to Monitor:**
+1. **Uptime**: Is your site accessible?
+2. **Performance**: How fast is content loading?
+3. **Errors**: Are users hitting 404s or other issues?
+4. **Security**: Any suspicious traffic or attacks?
+5. **Costs**: Are you staying within budget?
+
+**Monitoring Tools Used:**
+- **CloudWatch**: AWS native monitoring and alerting
+- **CloudFront Metrics**: CDN performance and caching efficiency
+- **S3 Metrics**: Storage usage and request patterns
+
+**Purpose:** Provides a visual overview of your site's health, performance, and usage patterns. This dashboard configuration creates a comprehensive monitoring view.
+
+**Dashboard Widgets:**
+- **Traffic Metrics**: Requests, data transfer, geographic distribution
+- **Performance Metrics**: Cache hit rates, response times
+- **Error Monitoring**: 4xx/5xx error rates and patterns
+- **Cost Tracking**: Service usage and cost trends
+
 ```json
 {
   "widgets": [
@@ -2087,7 +2508,37 @@ WebApplicationFirewall:
 
 ## 6. Deployment Strategies
 
-### Blue-Green Deployment
+**Why Multiple Deployment Strategies?**  
+Different deployment strategies offer different benefits. Blue-green deployments provide zero downtime, canary deployments allow testing with real users, and rolling deployments balance risk with simplicity.
+
+**Deployment Strategy Comparison:**
+
+| Strategy | Downtime | Risk | Complexity | Best For |
+|----------|----------|------|------------|----------|
+| **Basic** | Brief | Medium | Low | Personal sites, low traffic |
+| **Blue-Green** | Zero | Low | Medium | Professional sites, critical updates |
+| **Canary** | Zero | Very Low | High | High-traffic, risk-averse deployments |
+| **Rolling** | Zero | Low | Medium | Large applications, gradual rollouts |
+
+**Current Implementation:** The GitHub Actions workflow uses basic deployment with CloudFront invalidation for simplicity and cost-effectiveness.
+
+**What is Blue-Green Deployment?**  
+Blue-green deployment maintains two identical production environments ("blue" and "green"). You deploy to the inactive environment, test it, then switch traffic over. This provides zero downtime and instant rollback capability.
+
+**Benefits:**
+- Zero downtime deployments
+- Instant rollback if issues arise
+- Full testing of production environment before switch
+- Clear separation between old and new versions
+
+**Drawbacks:**
+- Double infrastructure costs during deployment
+- More complex setup and management
+- Database changes can be challenging
+
+**Implementation for Static Sites:**
+For static sites, you can use two S3 buckets or two CloudFront origins.
+
 ```yaml
 # GitHub Actions workflow for blue-green deployment
 name: Blue-Green Deployment
@@ -2119,6 +2570,23 @@ jobs:
 ```
 
 ### Canary Deployment
+
+**What is Canary Deployment?**  
+Canary deployment gradually shifts a small percentage of traffic to the new version while monitoring for issues. If problems arise, traffic can be quickly shifted back to the stable version.
+
+**Benefits:**
+- Risk mitigation through gradual rollout
+- Real user testing with minimal impact
+- Detailed performance comparison
+- Easy rollback with traffic shifting
+
+**How it works:**
+1. Deploy new version to separate infrastructure
+2. Route small percentage of traffic (5-10%) to new version
+3. Monitor metrics and user feedback
+4. Gradually increase traffic if all is well
+5. Complete rollout or rollback based on results
+
 ```bash
 #!/bin/bash
 # Canary deployment script
@@ -2169,13 +2637,28 @@ EOF
 
 ## 7. Quick Start Commands
 
-### CDK Quick Start
+**Getting Started Quickly**  
+These command sequences will get you from zero to deployed infrastructure in minutes. Choose the tool that best fits your experience and requirements.
+
+**Prerequisites for all approaches:**
+- AWS CLI installed and configured
+- Appropriate tool installed (CDK, Terraform, or AWS CLI for CloudFormation)
+- GitHub repository set up
+- Basic understanding of your chosen tool
+
+**Time to Deploy:**
+- **CDK**: ~10-15 minutes (including npm install)
+- **Terraform**: ~5-10 minutes
+- **CloudFormation**: ~5-10 minutes
+
+**Best for:** Developers comfortable with TypeScript/JavaScript who want maximum flexibility and type safety.
+
 ```bash
-# 1. Setup
+# 1. Setup - Create new CDK project
 mkdir infrastructure && cd infrastructure
-npm init -y
-npm install aws-cdk-lib constructs
-npm install -D aws-cdk typescript @types/node
+npm init -y                                    # Initialize package.json
+npm install aws-cdk-lib constructs             # Core CDK dependencies
+npm install -D aws-cdk typescript @types/node  # Development dependencies
 
 # 2. Initialize
 npx cdk init app --language typescript
@@ -2189,9 +2672,13 @@ npx cdk destroy
 ```
 
 ### Terraform Quick Start
+
+**Best for:** Infrastructure engineers who want industry-standard tooling and multi-cloud capability.
+
 ```bash
-# 1. Setup
-mkdir terraform && cd terraform
+# 1. Setup - Create Terraform project
+mkdir terraform && cd terraform               # Create project directory
+# Copy the Terraform files from this guide
 
 # 2. Initialize
 terraform init
@@ -2207,10 +2694,13 @@ terraform destroy
 ```
 
 ### CloudFormation Quick Start
+
+**Best for:** AWS-focused teams who prefer native AWS tooling and don't need multi-cloud support.
+
 ```bash
-# 1. Validate
+# 1. Validate - Check template syntax
 aws cloudformation validate-template \
-  --template-body file://cloudformation/portfolio-infrastructure.yaml
+  --template-body file://cloudformation/portfolio-infrastructure.yaml  # Verify template is valid
 
 # 2. Deploy
 aws cloudformation deploy \
@@ -2225,6 +2715,21 @@ aws cloudformation delete-stack --stack-name portfolio-site-infrastructure
 ---
 
 ## 8. Cost Estimates
+
+**Understanding AWS Costs**  
+While AWS offers a generous free tier, it's important to understand the ongoing costs of hosting your portfolio site. These estimates assume moderate traffic (typical for personal portfolio sites).
+
+**Cost Variables:**
+- **Traffic Volume**: More visitors = higher costs
+- **Geographic Distribution**: Global traffic costs more than regional
+- **Content Size**: Larger images/assets = higher transfer costs
+- **Features Used**: Monitoring, WAF, and other services add costs
+
+**Free Tier Benefits (first 12 months):**
+- S3: 5GB storage, 20,000 GET requests, 2,000 PUT requests
+- CloudFront: 1TB data transfer out, 10,000,000 HTTP requests
+- Route53: No free tier
+- CloudWatch: 10 metrics, 1,000,000 requests
 
 ### Monthly Cost Breakdown (Estimated)
 
@@ -2250,6 +2755,22 @@ aws cloudformation delete-stack --stack-name portfolio-site-infrastructure
 ---
 
 ## 9. Troubleshooting Guide
+
+**Common Issues and Solutions**  
+Deployment issues are inevitable, but most problems fall into common categories with well-known solutions. This guide covers the most frequent issues and their fixes.
+
+**Troubleshooting Approach:**
+1. **Identify the Error**: Read error messages carefully
+2. **Check Prerequisites**: Ensure all requirements are met
+3. **Verify Configuration**: Double-check syntax and values
+4. **Test Components**: Isolate and test individual parts
+5. **Check Documentation**: AWS docs are comprehensive and current
+
+**Quick Diagnosis:**
+- **Deployment fails**: Usually permissions or configuration issues
+- **Site not accessible**: DNS, CloudFront, or S3 configuration
+- **SSL errors**: Certificate validation or CloudFront setup
+- **Build failures**: Node.js version or dependency issues
 
 ### Common Issues and Solutions
 
@@ -2309,7 +2830,32 @@ aws dynamodb delete-item --table-name terraform-state-lock --key '{"LockID":{"S"
 
 ## 10. Migration Guide
 
+**From Manual to Infrastructure as Code**  
+If you currently have a manually deployed site, migrating to Infrastructure as Code provides better reliability, security, and maintainability. This guide helps you transition safely.
+
+**Migration Benefits:**
+- **Reproducibility**: Recreate infrastructure consistently
+- **Version Control**: Track infrastructure changes over time
+- **Team Collaboration**: Share and review infrastructure changes
+- **Disaster Recovery**: Quickly rebuild if something goes wrong
+- **Environment Parity**: Keep development and production in sync
+
+**Migration Strategy:**
+- **Plan**: Document current setup and desired end state
+- **Test**: Deploy IaC to new environment first
+- **Validate**: Ensure new infrastructure works correctly
+- **Switch**: Update DNS or redirect traffic
+- **Cleanup**: Remove old resources after verification
+
 ### From Current Manual Deployment to IaC
+
+**Migration Steps Overview:**
+1. **Assessment**: Document existing infrastructure
+2. **Backup**: Save current state and content
+3. **Import/Recreate**: Bring existing resources into IaC
+4. **Test**: Verify new infrastructure works
+5. **Switch**: Redirect traffic to new infrastructure
+6. **Cleanup**: Remove old manual resources
 
 #### Step 1: Backup Current Setup
 ```bash
@@ -2348,22 +2894,66 @@ WEBSITE_URL=https://yourdomain.com
 
 ## Conclusion
 
-This guide provides three robust Infrastructure as Code approaches for your React portfolio site:
+**Infrastructure as Code for Portfolio Sites**  
+This guide provides three production-ready approaches to deploy and manage your React portfolio site infrastructure. Each approach offers professional-grade capabilities while remaining cost-effective for personal use.
 
-1. **AWS CDK** - Best for TypeScript developers, most flexible
-2. **CloudFormation** - Native AWS, good for pure AWS environments  
-3. **Terraform** - Industry standard, multi-cloud capability
+### Tool Comparison Summary
 
-**Recommendation**: Start with **Terraform** for its widespread adoption and excellent documentation, or **AWS CDK** if you prefer TypeScript and want maximum flexibility.
+| Aspect | AWS CDK | CloudFormation | Terraform |
+|--------|---------|----------------|----------|
+| **Learning Curve** | Medium (TypeScript) | Medium (YAML) | Medium (HCL) |
+| **Flexibility** | Very High | High | Very High |
+| **Multi-Cloud** | AWS Only | AWS Only | Yes |
+| **Community** | Growing | Large (AWS) | Very Large |
+| **Testing** | Excellent | Limited | Good |
+| **IDE Support** | Excellent | Good | Good |
+| **Cost** | Free | Free | Free |
 
-Each approach provides:
+### Recommendations by Use Case
+
+1. **AWS CDK** - Best for TypeScript developers who want maximum flexibility and type safety
+2. **CloudFormation** - Best for AWS-focused teams who prefer native tooling and YAML
+3. **Terraform** - Best for infrastructure engineers who want industry-standard tooling
+
+**For beginners:** Start with **CloudFormation** for its native AWS integration and extensive documentation.
+
+**For developers:** Choose **AWS CDK** for familiar programming patterns and excellent IDE support.
+
+**For infrastructure teams:** Select **Terraform** for its widespread adoption and multi-cloud capabilities.
+
+### What You Get with Any Approach
+
+All three implementations provide enterprise-grade features:
+
+**🚀 Deployment & Operations**
 - ✅ Automated infrastructure deployment
-- ✅ SSL/TLS certificates
-- ✅ CloudFront CDN with optimized caching
-- ✅ Proper security configurations
-- ✅ Monitoring and alerting
-- ✅ Cost optimization
+- ✅ Zero-downtime deployments with CloudFront
 - ✅ Blue-green deployment capability
-- ✅ OIDC integration with GitHub Actions
+- ✅ Automated rollback on failures
 
-Choose the approach that best fits your team's expertise and organizational requirements.
+**🔒 Security & Compliance**
+- ✅ SSL/TLS certificates (free via ACM)
+- ✅ Private S3 buckets with secure access
+- ✅ OIDC integration with GitHub Actions (no AWS keys in code)
+- ✅ Security headers and best practices
+
+**⚡ Performance & Reliability**
+- ✅ CloudFront CDN with optimized caching
+- ✅ Global content delivery
+- ✅ Automatic failover and health checks
+- ✅ SPA routing support
+
+**📊 Monitoring & Optimization**
+- ✅ CloudWatch monitoring and alerting
+- ✅ Cost optimization with lifecycle policies
+- ✅ Performance dashboards
+- ✅ Automated log management
+
+**🎯 Next Steps**
+1. Choose your preferred Infrastructure as Code tool
+2. Follow the quick start guide for your chosen approach
+3. Set up GitHub Actions for automated deployments
+4. Configure monitoring and alerting
+5. Consider adding WAF for additional security
+
+Your portfolio site will be hosted on enterprise-grade infrastructure while remaining cost-effective for personal use. Choose the approach that best aligns with your technical expertise and career goals.

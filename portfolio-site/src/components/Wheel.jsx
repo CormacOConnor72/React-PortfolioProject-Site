@@ -238,7 +238,8 @@ const Wheel = () => {
                     width="400"
                     height="400"
                     viewBox="0 0 400 400"
-                    style={{ transform: `rotate(${rotation}deg)` }}
+                    style={{ transform: `rotate(${rotation}deg)`, cursor: isSpinning ? 'default' : 'pointer' }}
+                    onClick={spinWheel}
                   >
                     {wheelSegments.map((segment) => {
                       const { startAngle, endAngle, color, name, index } = segment;
