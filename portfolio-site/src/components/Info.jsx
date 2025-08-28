@@ -36,7 +36,7 @@ const Info = () => {
               <h2>Basic Information</h2>
               <div className="info-details">
                 <div className="info-item">
-                  <strong>Name:</strong> Cormac O'Connor
+                  <strong>Name:</strong> Cormac O&apos;Connor
                 </div>
                 <div className="info-item">
                   <strong>Age:</strong> 22 (template)
@@ -147,7 +147,7 @@ const Info = () => {
           </div>
 
           <div className="info-note">
-            <p><em>Note: This information page is for demonstration purposes. All details marked with "(template)" should be updated with actual information.</em></p>
+            <p><em>Note: This information page is for demonstration purposes. All details marked with &quot;(template)&quot; should be updated with actual information.</em></p>
           </div>
         </div>
       </div>
