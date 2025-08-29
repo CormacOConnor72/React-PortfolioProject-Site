@@ -40,12 +40,24 @@
     grid-template-columns: 1.2fr 1fr;
     gap: 4rem;
     padding: 0 2rem;
-    /* Maintain centering on desktop */
+    /* Symmetry template - mirror header container alignment */
     justify-items: start;
+    /* Perfect symmetry with header container */
+    max-width: clamp(1200px, 90vw, 1800px);
+    margin: 0 auto;
   }
   
   .hero-visual {
-    justify-self: center;
+    justify-self: end;
+    /* Profile picture positioning for symmetry - match right distance to left text distance */
+    padding-right: 0;
+  }
+  
+  .hero-text {
+    /* Align with header Portfolio text - consistent left alignment */
+    padding-left: 0;
+    margin-left: 0;
+    justify-self: start;
   }
 }
 
@@ -85,6 +97,9 @@
 @media (min-width: 768px) {
   .hero-text {
     text-align: left;
+    /* Symmetry template - ensure consistent left alignment */
+    padding-left: 0;
+    margin-left: 0;
   }
 }
 
@@ -229,6 +244,18 @@
   justify-content: center;
   align-items: center;
   position: relative;
+  /* Symmetry template - equal distance from edges */
+}
+
+@media (min-width: 768px) {
+  .hero-visual {
+    /* Perfect symmetry template - match text padding from opposite side */
+    justify-content: center;
+    padding-right: 0;
+    /* Ensure profile picture maintains same distance from right edge as text from left */
+    display: flex;
+    align-items: center;
+  }
 }
 
 .profile-container {
@@ -339,8 +366,11 @@
   animation: bounce 2s infinite;
   z-index: 2;
   margin-top: 2rem;
-  /* Ensure it doesn't overlap with content */
+  /* Perfect centering - account for any offset */
+  margin-left: 0;
+  margin-right: 0;
   pointer-events: auto;
+  /* Symmetry template - ensure perfect center alignment */
 }
 
 .scroll-indicator {
