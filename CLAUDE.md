@@ -75,14 +75,19 @@ App.jsx (Router wrapper)
 
 #### Responsive Design
 - Mobile-first CSS approach
+- **Dynamic Viewport Management**: JavaScript-based system for in-app browser compatibility
+- **Smart Grid Sizing**: CSS custom properties that adapt to viewport changes in real-time
 - Hamburger menu for mobile navigation in Header component
 - CSS Grid and Flexbox for layouts
 - **Multiple Breakpoints**: 375px, 768px, 1200px, 1600px, 2000px, 3440px+
+- **In-app Browser Detection**: Special handling for LinkedIn, Instagram, Facebook, WeChat browsers
 - Touch-friendly design with proper target sizes
 
 ### CSS Architecture
 - **Component-scoped CSS files** in `src/styles/` directory
 - **CSS custom properties** for consistent theming in `App.css`
+- **Dynamic CSS Variables**: `--dynamic-min-width`, `--viewport-width`, `--in-app-modifier` updated by ViewportManager
+- **Smooth Grid Transitions**: `--grid-transition` for seamless layout changes
 - **No CSS frameworks** (Bootstrap, Tailwind, etc.) - custom CSS only
 - Import pattern: `import '../styles/ComponentName.css'`
 - Advanced responsive patterns with CSS Container Queries support
@@ -121,9 +126,20 @@ App.jsx (Router wrapper)
 - **Mathematical Calculations**: Complex trigonometry for segment positioning
 - **Event Integration**: Listens to DataManager updates via custom events
 
+#### Viewport Management System
+- **ViewportManager Class** (`src/utils/viewportManager.js`): Singleton service for dynamic viewport handling
+- **Real-time Adaptation**: Updates CSS custom properties on window resize, orientation change, and visibility change
+- **In-app Browser Detection**: Identifies LinkedIn, Instagram, Facebook, WeChat, Line, Twitter in-app browsers
+- **Debounced Updates**: 100ms debouncing for resize events, 500ms delay for orientation changes
+- **CSS Classes Added**: `.narrow-viewport`, `.very-narrow-viewport`, `.in-app-browser` for styling hooks
+- **Grid Responsiveness**: `minmax(var(--dynamic-min-width, 280px), 1fr)` ensures mobile compatibility
+- **Smooth Transitions**: 0.4s cubic-bezier transitions prevent jarring layout changes
+- **Development Logging**: Console output in development mode for debugging
+
 #### Performance Considerations
 - Intersection Observer for efficient scroll animations
 - Event-driven architecture for real-time updates
+- **Viewport Manager**: Debounced resize handling with singleton pattern
 - Optimized re-renders with proper React patterns
 - No lazy loading implemented yet
 - No image optimization beyond placeholders
@@ -171,8 +187,10 @@ Edit `src/components/Projects.jsx` and update the `projects` array with real pro
 
 ### Styling Changes
 - **Global theme colors**: Modify CSS custom properties in `src/App.css`
+- **Dynamic viewport properties**: `--dynamic-min-width`, `--viewport-width`, `--in-app-modifier` automatically managed
 - **Component styles**: Edit individual CSS files in `src/styles/`
-- **Responsive breakpoints**: Multiple breakpoints for various devices
+- **Grid layouts**: Projects.css and Info.css use `var(--dynamic-min-width)` for responsive grid columns
+- **Responsive breakpoints**: Multiple breakpoints for various devices with dynamic adaptation
 
 ### Running Tests
 ```bash
@@ -182,6 +200,21 @@ npm run test:run       # Single run for CI
 npm run test:ui        # Visual test UI
 npm run test:coverage  # Generate coverage report
 ```
+
+### Viewport Management and Mobile Issues
+The application includes a sophisticated viewport management system to handle sizing issues across different browsers and devices:
+
+#### Common Issues and Solutions
+- **In-app browser sizing**: ViewportManager automatically detects and adapts to LinkedIn, Instagram, Facebook in-app browsers
+- **Initial load jumps**: Grid layouts use smooth transitions to prevent jarring size changes
+- **Mobile overflow**: Dynamic `--dynamic-min-width` ensures content never exceeds viewport width
+- **Grid responsiveness**: Uses `minmax(var(--dynamic-min-width, 280px), 1fr)` pattern for all grid layouts
+
+#### Debugging Viewport Issues
+- Enable development mode to see viewport change logs in browser console
+- Check CSS custom properties: `--dynamic-min-width`, `--viewport-width`, `--in-app-modifier`
+- Verify CSS classes: `.narrow-viewport`, `.very-narrow-viewport`, `.in-app-browser`
+- ViewportManager instance available globally for manual testing: `viewportManager.forceUpdate()`
 
 ## File Structure
 ```
@@ -203,7 +236,8 @@ portfolio-site/
 │   │   └── setup.js            # Testing configuration
 │   ├── hooks/                  # Empty, ready for custom hooks
 │   ├── pages/                  # Empty, ready for page components
-│   └── utils/                  # Empty, ready for utility functions
+│   └── utils/                  # Utility functions
+│       └── viewportManager.js  # Dynamic viewport management for in-app browsers
 ├── public/                     # Static assets
 ├── dist/                       # Build output (gitignored)
 └── .github/
@@ -216,7 +250,9 @@ portfolio-site/
 - **Comprehensive Testing** - Full test suite with Vitest and Testing Library
 - **Live AWS Backend** - Production data persistence with DynamoDB
 - **Cross-component Communication** - Custom event system for real-time updates
+- **Dynamic Viewport Management** - Automatic adaptation for in-app browsers and mobile devices
 - **Production-ready CI/CD** - Complete GitHub Actions deployment pipeline
 - Router is imported but navigation uses scroll-to-section instead of routing
 - Form handling in Contact component is placeholder (no backend integration)
 - All project images are placeholder URLs that need to be replaced
+- **ViewportManager**: Auto-initializes in main.jsx, no manual setup required

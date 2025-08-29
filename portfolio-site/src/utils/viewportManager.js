@@ -63,7 +63,7 @@ class ViewportManager {
     this.detectInAppBrowser();
     
     // Debug logging in development
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       console.log(`Viewport Manager: ${vw}x${vh}, min-width: ${dynamicMinWidth}px`);
     }
   }
