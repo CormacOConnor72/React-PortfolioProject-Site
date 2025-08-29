@@ -145,8 +145,8 @@ body {
 
 @media (min-width: 2560px) {
   .container {
-    padding: 0 8rem;
-    max-width: 2800px;
+    padding: 0 clamp(8rem, 5vw, 15rem);
+    max-width: clamp(2800px, 85vw, 5000px);
   }
 }
 

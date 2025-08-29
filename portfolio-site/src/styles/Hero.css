@@ -63,8 +63,8 @@
 
 @media (min-width: 2560px) {
   .hero-content {
-    padding: 0 8rem;
-    max-width: 2800px;
+    padding: 0 clamp(8rem, 5vw, 15rem);
+    max-width: clamp(2800px, 85vw, 5000px);
   }
 }
 
@@ -387,9 +387,26 @@
   }
 }
 
-@media (max-width: 480px) and (max-height: 700px) {
+/* Mobile layout adjustments - below 768px shows single column */
+@media (max-width: 767px) {
+  .hero {
+    padding-bottom: 4rem; /* Space for scroll indicator below profile */
+  }
+  
   .hero-scroll {
-    bottom: 1rem; /* Closer to bottom on small mobile screens */
+    bottom: 1.5rem;
+    /* On mobile, center it properly below the entire content */
+  }
+}
+
+/* Small mobile screens */
+@media (max-width: 480px) {
+  .hero {
+    padding-bottom: 3.5rem;
+  }
+  
+  .hero-scroll {
+    bottom: 1rem;
   }
   
   .scroll-indicator {
@@ -398,9 +415,20 @@
   }
 }
 
+/* Very small mobile screens and short heights */
+@media (max-width: 480px) and (max-height: 700px) {
+  .hero-scroll {
+    bottom: 0.75rem;
+  }
+  
+  .hero {
+    padding-bottom: 3rem;
+  }
+}
+
 /* Narrow viewport handling for in-app browsers */
 .narrow-viewport .hero-scroll {
-  bottom: 1.5rem;
+  bottom: 1rem;
 }
 
 .very-narrow-viewport .hero-scroll {
