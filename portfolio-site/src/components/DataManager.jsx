@@ -53,8 +53,8 @@ const DataManager = () => {
 
     if (sectionRef.current) observer.observe(sectionRef.current);
 
-    const tableRows = document.querySelectorAll('.data-row');
-    tableRows.forEach(row => observer.observe(row));
+    const gridRows = document.querySelectorAll('.data-grid-row');
+    gridRows.forEach(row => observer.observe(row));
 
     return () => observer.disconnect();
   }, [entries]);
@@ -273,10 +273,32 @@ const DataManager = () => {
             </div>
 
             {isLoading ? (
-              <div className="loading-state">
-                <div className="loading-spinner">🔄</div>
-                <h4>Loading entries...</h4>
-                <p>Fetching data from AWS</p>
+              <div className="data-grid-container loading">
+                <div className="data-grid-header">
+                  <div className="grid-cell header-name">Name</div>
+                  <div className="grid-cell header-type">Type</div>
+                  <div className="grid-cell header-who">Who?</div>
+                  <div className="grid-cell header-why">Why?</div>
+                  <div className="grid-cell header-date">Date Added</div>
+                  <div className="grid-cell header-actions">Actions</div>
+                </div>
+                <div className="data-grid-body">
+                  {[1, 2, 3].map((i) => (
+                    <div key={`skeleton-${i}`} className="data-grid-row skeleton-row">
+                      <div className="grid-cell name-cell"><div className="skeleton-text"></div></div>
+                      <div className="grid-cell type-cell"><div className="skeleton-badge"></div></div>
+                      <div className="grid-cell who-cell"><div className="skeleton-text"></div></div>
+                      <div className="grid-cell why-cell"><div className="skeleton-text skeleton-long"></div></div>
+                      <div className="grid-cell date-cell"><div className="skeleton-text skeleton-short"></div></div>
+                      <div className="grid-cell actions-cell"><div className="skeleton-button"></div></div>
+                    </div>
+                  ))}
+                </div>
+                <div className="loading-overlay">
+                  <div className="loading-spinner">🔄</div>
+                  <h4>Loading entries...</h4>
+                  <p>Fetching data from AWS</p>
+                </div>
               </div>
             ) : entries.length === 0 ? (
               <div className="empty-state">
@@ -285,41 +307,37 @@ const DataManager = () => {
                 <p>Add your first entry using the form above</p>
               </div>
             ) : (
-              <div className="data-table-container">
-                <table className="data-table">
-                  <thead>
-                    <tr>
-                      <th>Name</th>
-                      <th>Type</th>
-                      <th>Who?</th>
-                      <th>Why?</th>
-                      <th>Date Added</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {entries.map((entry) => (
-                      <tr key={entry.id} className="data-row">
-                        <td className="name-cell">{entry.name}</td>
-                        <td className="type-cell">
-                          <span className="type-badge">{entry.type}</span>
-                        </td>
-                        <td className="who-cell">{entry.who}</td>
-                        <td className="why-cell">{entry.why}</td>
-                        <td className="date-cell">{formatDate(entry.createdAt)}</td>
-                        <td className="actions-cell">
-                          <button
-                            onClick={() => handleDelete(entry.id)}
-                            className="delete-btn"
-                            title="Delete entry"
-                          >
-                            🗑️
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <div className="data-grid-container">
+                <div className="data-grid-header">
+                  <div className="grid-cell header-name">Name</div>
+                  <div className="grid-cell header-type">Type</div>
+                  <div className="grid-cell header-who">Who?</div>
+                  <div className="grid-cell header-why">Why?</div>
+                  <div className="grid-cell header-date">Date Added</div>
+                  <div className="grid-cell header-actions">Actions</div>
+                </div>
+                <div className="data-grid-body">
+                  {entries.map((entry) => (
+                    <div key={entry.id} className="data-grid-row">
+                      <div className="grid-cell name-cell">{entry.name}</div>
+                      <div className="grid-cell type-cell">
+                        <span className="type-badge">{entry.type}</span>
+                      </div>
+                      <div className="grid-cell who-cell">{entry.who}</div>
+                      <div className="grid-cell why-cell">{entry.why}</div>
+                      <div className="grid-cell date-cell">{formatDate(entry.createdAt)}</div>
+                      <div className="grid-cell actions-cell">
+                        <button
+                          onClick={() => handleDelete(entry.id)}
+                          className="delete-btn"
+                          title="Delete entry"
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
