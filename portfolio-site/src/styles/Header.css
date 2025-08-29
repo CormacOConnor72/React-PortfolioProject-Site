@@ -7,6 +7,10 @@
   background-color: var(--background);
   transition: var(--transition);
   border-bottom: 1px solid var(--border-color);
+  /* Centered header layout */
+  display: flex;
+  justify-content: center;
+  width: 100%;
 }
 
 .header.scrolled {
@@ -21,12 +25,20 @@
   padding: 0.75rem 1rem;
   height: 70px;
   width: 100%;
+  max-width: clamp(1200px, 90vw, 1800px);
   box-sizing: border-box;
+  /* Symmetry template - mirror hero content layout */
+  flex-direction: row;
+  /* Match hero content padding for perfect alignment */
+  position: relative;
+  margin: 0 auto;
 }
 
 @media (min-width: 768px) {
   .header .container {
     padding: 1rem 2rem;
+    /* Perfect alignment with hero content */
+    max-width: clamp(1200px, 90vw, 1800px);
   }
 }
 
@@ -36,12 +48,35 @@
   }
 }
 
+@media (min-width: 1600px) {
+  .header .container {
+    padding: 1rem 4rem;
+    max-width: 1800px;
+  }
+}
+
+@media (min-width: 2000px) {
+  .header .container {
+    padding: 1rem 6rem;
+    max-width: 2200px;
+  }
+}
+
+@media (min-width: 2560px) {
+  .header .container {
+    padding: 1rem clamp(8rem, 5vw, 15rem);
+    max-width: clamp(2800px, 85vw, 5000px);
+  }
+}
+
 .logo a {
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--primary-color);
   text-decoration: none;
   transition: var(--transition);
+  /* Symmetry template - align with hero title positioning */
+  display: block;
 }
 
 .logo a:hover {
@@ -54,6 +89,8 @@
   gap: 2rem;
   margin: 0;
   padding: 0;
+  /* Symmetry template - mirror profile picture alignment */
+  align-items: center;
 }
 
 .nav a {

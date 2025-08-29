@@ -21,6 +21,8 @@
   margin-top: 3rem;
   position: relative;
   z-index: 1;
+  /* Enhanced centering */
+  justify-items: center;
 }
 
 @media (min-width: 768px) {
@@ -28,6 +30,8 @@
     grid-template-columns: 1fr 1.2fr;
     gap: 6rem;
     align-items: start;
+    /* Reset for desktop layout */
+    justify-items: stretch;
   }
 }
 
