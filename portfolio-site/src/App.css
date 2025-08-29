@@ -48,6 +48,15 @@ table {
   --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
   --border-radius: 8px;
   --transition: all 0.3s ease;
+
+  /* Dynamic Viewport Properties - Updated by ViewportManager */
+  --dynamic-min-width: 280px;
+  --viewport-width: 100vw;
+  --viewport-height: 100vh;
+  --in-app-modifier: 0.9;
+  
+  /* Grid Layout Variables */
+  --grid-transition: grid-template-columns 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 [data-theme="dark"] {
