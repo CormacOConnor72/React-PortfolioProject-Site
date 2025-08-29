@@ -18,10 +18,14 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 3rem;
   margin-top: 3rem;
   position: relative;
   z-index: 1;
+  /* Enhanced centering */
+  width: 100%;
+  text-align: center;
 }
 
 /* Filter Controls */

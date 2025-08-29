@@ -72,6 +72,9 @@
   position: relative;
   z-index: 1;
   transition: var(--grid-transition);
+  /* Enhanced centering */
+  justify-content: center;
+  justify-items: center;
 }
 
 @media (min-width: 1200px) {

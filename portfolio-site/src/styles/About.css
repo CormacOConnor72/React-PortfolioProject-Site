@@ -12,6 +12,9 @@
   transition: var(--transition);
   position: relative;
   z-index: 1;
+  /* Enhanced centering */
+  justify-items: center;
+  align-items: start;
 }
 
 .about-content.animate {
@@ -24,6 +27,8 @@
     grid-template-columns: 1fr 1.2fr;
     gap: 6rem;
     align-items: start;
+    /* Maintain desktop alignment */
+    justify-items: stretch;
   }
 }
 

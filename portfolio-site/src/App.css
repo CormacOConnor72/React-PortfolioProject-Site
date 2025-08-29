@@ -80,6 +80,7 @@ html {
   scroll-behavior: smooth;
   overflow-x: hidden;
   width: 100%;
+  height: 100%;
 }
 
 body {
@@ -95,6 +96,10 @@ body {
   padding: 0;
   width: 100%;
   min-width: 320px;
+  /* Enhanced centering */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .container {
@@ -103,6 +108,11 @@ body {
   padding: 0 1rem;
   width: 100%;
   box-sizing: border-box;
+  /* Enhanced centering with viewport manager integration */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 @media (min-width: 375px) {
@@ -321,7 +331,13 @@ section {
   min-height: 100vh;
   position: relative;
   width: 100%;
+  max-width: 100vw;
   overflow-x: hidden;
+  /* Centered app layout */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 auto;
 }
 
 main {

@@ -7,6 +7,10 @@
   background-color: var(--background);
   transition: var(--transition);
   border-bottom: 1px solid var(--border-color);
+  /* Centered header layout */
+  display: flex;
+  justify-content: center;
+  width: 100%;
 }
 
 .header.scrolled {
@@ -21,7 +25,10 @@
   padding: 0.75rem 1rem;
   height: 70px;
   width: 100%;
+  max-width: clamp(1200px, 90vw, 1800px);
   box-sizing: border-box;
+  /* Override container centering for header */
+  flex-direction: row;
 }
 
 @media (min-width: 768px) {

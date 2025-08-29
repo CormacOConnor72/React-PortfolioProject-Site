@@ -33,6 +33,9 @@
   gap: 2rem;
   margin-bottom: 3rem;
   transition: var(--grid-transition);
+  /* Enhanced centering */
+  justify-content: center;
+  justify-items: center;
 }
 
 .info-card {
