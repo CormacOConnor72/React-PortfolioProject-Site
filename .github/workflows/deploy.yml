@@ -60,7 +60,11 @@ jobs:
     - name: Deploy to S3
       run: |
         aws s3 sync portfolio-site/dist/ s3://${{ secrets.AWS_S3_BUCKET_NAME }}/ --delete
-      
+    
+    # Step 9: Add Cloudfront Invalidation
+    - name: Invalidate CloudFront
+      run: |
+        aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
     # Optional Step 9: Invalidate CloudFront (if you use it)
     # - name: Invalidate CloudFront
     #   run: |
