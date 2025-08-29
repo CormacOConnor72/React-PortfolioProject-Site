@@ -296,6 +296,9 @@
   border-radius: 16px;
   overflow: hidden;
   position: relative;
+  width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
 }
 
 .data-table-container::before {
@@ -359,13 +362,15 @@
 
 /* Cell Specific Styles */
 .name-cell {
-  width: 150px;
+  width: 20%;
   font-weight: 600;
   color: var(--text-primary);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .type-cell {
-  width: 120px;
+  width: 15%;
 }
 
 .type-badge {
@@ -376,27 +381,33 @@
   font-size: 0.8rem;
   font-weight: 600;
   white-space: nowrap;
+  display: inline-block;
 }
 
 .who-cell {
-  width: 150px;
+  width: 20%;
   font-weight: 500;
   color: var(--text-primary);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .why-cell {
-  max-width: 300px;
+  width: 30%;
   line-height: 1.5;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .date-cell {
-  width: 120px;
+  width: 10%;
   font-size: 0.9rem;
   color: var(--text-light);
+  white-space: nowrap;
 }
 
 .actions-cell {
-  width: 80px;
+  width: 5%;
   text-align: center;
 }
 
@@ -443,7 +454,8 @@
   }
   
   .data-table {
-    min-width: 700px;
+    width: 100%;
+    table-layout: fixed;
   }
   
   .data-table th,
@@ -452,8 +464,17 @@
     font-size: 0.9rem;
   }
   
-  .why-cell {
-    max-width: 200px;
+  .name-cell, .who-cell, .why-cell {
+    font-size: 0.85rem;
+  }
+  
+  .type-badge {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.5rem;
+  }
+  
+  .date-cell {
+    font-size: 0.75rem;
   }
   
   .data-header {
@@ -468,7 +489,8 @@
   }
   
   .data-table {
-    min-width: 600px;
+    width: 100%;
+    table-layout: fixed;
   }
   
   .data-table th,
@@ -477,12 +499,21 @@
     font-size: 0.8rem;
   }
   
-  .why-cell {
-    max-width: 150px;
+  .name-cell, .who-cell, .why-cell {
+    font-size: 0.75rem;
   }
   
   .type-badge {
+    font-size: 0.65rem;
+    padding: 0.25rem 0.4rem;
+  }
+  
+  .date-cell {
     font-size: 0.7rem;
-    padding: 0.3rem 0.6rem;
+  }
+  
+  .delete-btn {
+    padding: 0.4rem;
+    font-size: 0.9rem;
   }
 }

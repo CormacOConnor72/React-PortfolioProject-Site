@@ -230,9 +230,10 @@
   background: rgba(59, 130, 246, 0.05);
   border: 2px solid rgba(59, 130, 246, 0.2);
   border-radius: 50%;
-  width: 400px;
-  height: 400px;
+  width: min(400px, 90vw);
+  height: min(400px, 90vw);
   text-align: center;
+  box-sizing: border-box;
 }
 
 .loading-wheel .loading-spinner {
@@ -264,9 +265,10 @@
   background: rgba(255, 255, 255, 0.05);
   border: 2px dashed rgba(255, 255, 255, 0.2);
   border-radius: 50%;
-  width: 400px;
-  height: 400px;
+  width: min(400px, 90vw);
+  height: min(400px, 90vw);
   text-align: center;
+  box-sizing: border-box;
 }
 
 .empty-icon {
@@ -349,13 +351,13 @@
   }
   
   .wheel {
-    width: 300px;
-    height: 300px;
+    width: min(300px, 85vw);
+    height: min(300px, 85vw);
   }
   
-  .empty-wheel {
-    width: 300px;
-    height: 300px;
+  .empty-wheel, .loading-wheel {
+    width: min(300px, 85vw);
+    height: min(300px, 85vw);
     padding: 2rem 1rem;
   }
   
@@ -393,13 +395,13 @@
   }
   
   .wheel {
-    width: 250px;
-    height: 250px;
+    width: min(250px, 80vw);
+    height: min(250px, 80vw);
   }
   
-  .empty-wheel {
-    width: 250px;
-    height: 250px;
+  .empty-wheel, .loading-wheel {
+    width: min(250px, 80vw);
+    height: min(250px, 80vw);
     padding: 1.5rem 1rem;
   }
   

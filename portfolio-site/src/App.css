@@ -5,6 +5,31 @@
   box-sizing: border-box;
 }
 
+*,
+*:before,
+*:after {
+  max-width: 100%;
+}
+
+/* Prevent horizontal overflow */
+img, 
+svg, 
+video, 
+canvas, 
+iframe, 
+embed, 
+object {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Ensure tables are responsive */
+table {
+  max-width: 100%;
+  table-layout: fixed;
+  word-wrap: break-word;
+}
+
 :root {
   /* Modern Black & White Palette */
   --primary-color: #000000;
@@ -44,6 +69,8 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 body {
