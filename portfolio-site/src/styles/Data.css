@@ -1,68 +1,5 @@
-/* Data Page - Using template foundation structure */
-
-.data-page {
-  min-height: 100vh;
-  background: var(--background);
-  opacity: 0;
-  transform: translateY(20px);
-  transition: all 0.6s ease-out;
-}
-
-.data-page.page-loaded {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Header Section - Following template pattern */
-.data-header {
-  background: var(--primary-color);
-  color: white;
-  padding: 4rem 0 6rem;
-  position: relative;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.data-header .container {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  align-items: flex-start;
-}
-
-.back-link {
-  color: rgba(255, 255, 255, 0.9);
-  text-decoration: none;
-  font-weight: 500;
-  font-size: 1rem;
-  transition: var(--transition);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.back-link:hover {
-  color: white;
-  transform: translateX(-2px);
-}
-
-.data-title {
-  font-size: clamp(2.5rem, 6vw, 4rem);
-  font-weight: 700;
-  margin: 0;
-  line-height: 1.2;
-  opacity: 0;
-  transform: translateY(30px);
-}
-
-.data-subtitle {
-  font-size: clamp(1.1rem, 3vw, 1.4rem);
-  margin: 0;
-  opacity: 0.9;
-  max-width: 600px;
-  line-height: 1.5;
-  opacity: 0;
-  transform: translateY(30px);
-}
+/* Data Page - Using shared container system */
+@import './shared.css';
 
 /* Tab Navigation - Enhanced with template styling */
 .data-nav {
@@ -112,33 +49,27 @@
   font-size: 1rem;
 }
 
-/* Content Area - Following template structure */
+/* Content Area - Using shared page section system */
 .data-content {
   padding: 3rem 0;
 }
 
-.data-content .container {
-  max-width: 1400px;
+.data-content .page-container {
+  width: 100%;
+  max-width: var(--viewport-width);
+}
+
+/* Data grid using dynamic viewport properties */
+.data-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(var(--dynamic-min-width, 280px), 100%), 1fr));
+  gap: 2rem;
+  transition: var(--grid-transition);
+  width: 100%;
 }
 
 .tab-panel {
   animation: fadeIn 0.3s ease-out;
-}
-
-.data-section {
-  padding: 2rem 0;
-}
-
-/* Animation Classes - Consistent with template */
-.animate-on-scroll {
-  opacity: 0;
-  transform: translateY(30px);
-  transition: all 0.8s ease-out;
-}
-
-.animate-on-scroll.animate {
-  opacity: 1;
-  transform: translateY(0);
 }
 
 @keyframes fadeIn {
@@ -146,20 +77,8 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Responsive Design - Enhanced */
+/* Data page responsive adjustments */
 @media (max-width: 768px) {
-  .data-header {
-    padding: 2rem 0 4rem;
-  }
-  
-  .data-title {
-    font-size: 2.5rem;
-  }
-  
-  .data-subtitle {
-    font-size: 1.1rem;
-  }
-  
   .tab-list {
     gap: 0.25rem;
     flex-direction: column;
@@ -177,10 +96,15 @@
   }
 }
 
-/* Viewport Manager Integration */
+/* Data page viewport adjustments - Enhanced with viewport manager */
 .narrow-viewport .tab-list {
   flex-direction: column;
   gap: 0.5rem;
+}
+
+.narrow-viewport .data-grid {
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
 }
 
 .very-narrow-viewport .tab-button {
@@ -188,11 +112,14 @@
   font-size: 0.85rem;
 }
 
-/* In-app browser adjustments */
-.in-app-browser .data-header {
-  padding: 3rem 0 4rem;
+.very-narrow-viewport .page-container {
+  padding: 0 0.75rem;
 }
 
 .in-app-browser .data-content {
-  padding: 2rem 0;
+  padding: calc(2rem * var(--in-app-modifier, 1));
+}
+
+.in-app-browser .data-grid {
+  gap: calc(1.5rem * var(--in-app-modifier, 1));
 }

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import '../styles/shared.css';
 import '../styles/Info.css';
 
 const Info = () => {
@@ -27,24 +28,24 @@ const Info = () => {
   }, []);
 
   return (
-    <div className={`info-page ${isVisible ? 'page-loaded' : ''}`}>
-      <header className="info-header">
-        <div className="container">
-          <Link to="/" className="back-link animate-on-scroll">← Back to Portfolio</Link>
-          <h1 className="info-title animate-on-scroll">Personal Information</h1>
-          <p className="info-subtitle animate-on-scroll">
+    <div className={`page-transition ${isVisible ? 'page-loaded' : ''}`}>
+      <header className="page-header">
+        <div className="page-container">
+          <Link to="/" className="page-back-link animate-on-scroll">← Back to Portfolio</Link>
+          <h1 className="page-title animate-on-scroll">Personal Information</h1>
+          <p className="page-subtitle animate-on-scroll">
             Get to know more about me, my background, and interests
           </p>
         </div>
       </header>
 
       <main className="info-main">
-        <section className="info-section">
-          <div className="container">
+        <section className="page-section">
+          <div className="page-container">
             <div className="info-content animate-on-scroll">
           
               <div className="info-grid">
-                <div className="info-card animate-on-scroll">
+                <div className="content-card info-card animate-on-scroll">
                   <div className="info-icon">👨‍💻</div>
                   <h2>Basic Information</h2>
               <div className="info-details">
@@ -63,7 +64,7 @@ const Info = () => {
               </div>
             </div>
 
-                <div className="info-card animate-on-scroll">
+                <div className="content-card info-card animate-on-scroll">
                   <div className="info-icon">🎓</div>
                   <h2>Education</h2>
               <div className="info-details">
@@ -82,7 +83,7 @@ const Info = () => {
               </div>
             </div>
 
-                <div className="info-card animate-on-scroll">
+                <div className="content-card info-card animate-on-scroll">
                   <div className="info-icon">💼</div>
                   <h2>Professional</h2>
               <div className="info-details">
@@ -101,7 +102,7 @@ const Info = () => {
               </div>
             </div>
 
-                <div className="info-card animate-on-scroll">
+                <div className="content-card info-card animate-on-scroll">
                   <div className="info-icon">🌟</div>
                   <h2>Interests</h2>
               <div className="info-details">
@@ -120,7 +121,7 @@ const Info = () => {
               </div>
             </div>
 
-                <div className="info-card animate-on-scroll">
+                <div className="content-card info-card animate-on-scroll">
                   <div className="info-icon">📞</div>
                   <h2>Contact Details</h2>
               <div className="info-details">
@@ -136,7 +137,7 @@ const Info = () => {
               </div>
             </div>
 
-                <div className="info-card animate-on-scroll">
+                <div className="content-card info-card animate-on-scroll">
                   <div className="info-icon">🏆</div>
                   <h2>Achievements</h2>
               <div className="info-details">

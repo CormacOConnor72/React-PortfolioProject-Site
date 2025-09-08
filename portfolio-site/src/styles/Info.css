@@ -1,4 +1,5 @@
 /* Info Page - Using template foundation structure */
+@import './shared.css';
 
 .info-page {
   min-height: 100vh;
@@ -22,7 +23,7 @@
   border-bottom: 1px solid var(--border-color);
 }
 
-.info-header .container {
+.info-header .page-container {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -76,11 +77,11 @@
 
 .info-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(var(--dynamic-min-width, 280px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(var(--dynamic-min-width, 280px), 100%), 1fr));
   gap: 2rem;
   margin-bottom: 3rem;
   transition: var(--grid-transition);
-  /* Enhanced centering */
+  width: 100%;
   justify-content: center;
   justify-items: center;
 }
@@ -174,6 +175,24 @@
 .animate-on-scroll.animate {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* Enhanced Viewport Manager Integration */
+.narrow-viewport .info-grid {
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+.very-narrow-viewport .info-header .page-container {
+  padding: 0 0.75rem;
+}
+
+.in-app-browser .info-section {
+  padding: calc(6rem * var(--in-app-modifier, 1)) 0;
+}
+
+.in-app-browser .info-grid {
+  gap: calc(2rem * var(--in-app-modifier, 1));
 }
 
 /* Responsive Design */

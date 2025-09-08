@@ -1,89 +1,9 @@
-/* Template Page - Foundation CSS using your existing design system */
-
-.template-page {
-  min-height: 100vh;
-  background: var(--background);
-  opacity: 0;
-  transform: translateY(20px);
-  transition: all 0.6s ease-out;
-}
-
-.template-page.page-loaded {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Header Section */
-.template-header {
-  background: var(--primary-color);
-  color: white;
-  padding: 4rem 0 6rem;
-  position: relative;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.template-header .container {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  align-items: flex-start;
-}
-
-.back-link {
-  color: rgba(255, 255, 255, 0.9);
-  text-decoration: none;
-  font-weight: 500;
-  font-size: 1rem;
-  transition: var(--transition);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.back-link:hover {
-  color: white;
-  transform: translateX(-2px);
-}
-
-.template-title {
-  font-size: clamp(2.5rem, 6vw, 4rem);
-  font-weight: 700;
-  margin: 0;
-  line-height: 1.2;
-  opacity: 0;
-  transform: translateY(30px);
-}
-
-.template-subtitle {
-  font-size: clamp(1.1rem, 3vw, 1.4rem);
-  margin: 0;
-  opacity: 0.9;
-  max-width: 600px;
-  line-height: 1.5;
-  opacity: 0;
-  transform: translateY(30px);
-}
+/* Template Page - Using shared container system */
+@import './shared.css';
 
 /* Main Content */
 .template-main {
   position: relative;
-}
-
-/* Section Base Styles - Inherit from App.css */
-.template-section {
-  padding: 6rem 0;
-  position: relative;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.template-section:last-child {
-  border-bottom: none;
-}
-
-@media (max-width: 768px) {
-  .template-section {
-    padding: 4rem 0;
-  }
 }
 
 /* Hero Style Section */
@@ -100,6 +20,8 @@
   gap: 3rem;
   align-items: center;
   width: 100%;
+  max-width: var(--viewport-width);
+  transition: var(--grid-transition);
 }
 
 @media (min-width: 768px) {
@@ -124,8 +46,8 @@
 }
 
 .visual-placeholder {
-  width: min(300px, 80vw);
-  height: min(300px, 80vw);
+  width: min(300px, calc(80 * var(--viewport-width) / 100));
+  height: min(300px, calc(80 * var(--viewport-width) / 100));
   border: 2px dashed var(--border-color);
   border-radius: var(--border-radius);
   display: flex;
@@ -179,27 +101,7 @@
   background: var(--background-secondary);
 }
 
-.content-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
-  gap: 2rem;
-  margin-top: 3rem;
-  transition: var(--grid-transition);
-}
-
-.content-card {
-  background: var(--background);
-  padding: 2rem;
-  border-radius: var(--border-radius);
-  border: 1px solid var(--border-color);
-  transition: var(--transition);
-}
-
-.content-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
-}
-
+/* Content card customization beyond shared styles */
 .content-card h3 {
   color: var(--text-primary);
   margin-bottom: 1rem;
@@ -365,36 +267,8 @@
   margin: 0;
 }
 
-/* Animation Classes */
-.animate-on-scroll {
-  opacity: 0;
-  transform: translateY(30px);
-  transition: all 0.8s ease-out;
-}
-
-.animate-on-scroll.animate {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Responsive Design */
+/* Responsive Design - Template specific */
 @media (max-width: 768px) {
-  .template-header {
-    padding: 2rem 0 4rem;
-  }
-  
-  .template-title {
-    font-size: 2.5rem;
-  }
-  
-  .template-subtitle {
-    font-size: 1.1rem;
-  }
-  
-  .content-grid {
-    grid-template-columns: 1fr;
-  }
-  
   .tool-controls {
     flex-direction: column;
   }
@@ -409,10 +283,13 @@
   }
 }
 
-/* Viewport Manager Integration */
-.narrow-viewport .content-grid {
-  grid-template-columns: 1fr;
-  gap: 1.5rem;
+/* Enhanced Template viewport adjustments with viewport manager */
+.narrow-viewport .grid-layout {
+  gap: 2rem;
+}
+
+.narrow-viewport .tool-controls {
+  flex-direction: column;
 }
 
 .very-narrow-viewport .data-table th,
@@ -421,11 +298,15 @@
   font-size: 0.9rem;
 }
 
-/* In-app browser adjustments */
-.in-app-browser .template-section {
-  padding: 4rem 0;
+.very-narrow-viewport .visual-placeholder {
+  width: min(250px, calc(90 * var(--viewport-width) / 100));
+  height: min(250px, calc(90 * var(--viewport-width) / 100));
 }
 
-.in-app-browser .template-header {
-  padding: 3rem 0 4rem;
+.in-app-browser .grid-layout {
+  gap: calc(3rem * var(--in-app-modifier, 1));
+}
+
+.in-app-browser .tool-display {
+  padding: calc(2rem * var(--in-app-modifier, 1));
 }

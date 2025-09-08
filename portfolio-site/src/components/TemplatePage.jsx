@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import '../styles/shared.css';
 import '../styles/TemplatePage.css';
 
 const TemplatePage = () => {
@@ -27,13 +28,13 @@ const TemplatePage = () => {
   }, []);
 
   return (
-    <div className={`template-page ${isVisible ? 'page-loaded' : ''}`}>
+    <div className={`page-transition ${isVisible ? 'page-loaded' : ''}`}>
       {/* Header Section */}
-      <header className="template-header">
-        <div className="container">
-          <Link to="/" className="back-link">← Back to Portfolio</Link>
-          <h1 className="template-title animate-on-scroll">Template Page</h1>
-          <p className="template-subtitle animate-on-scroll">
+      <header className="page-header">
+        <div className="page-container">
+          <Link to="/" className="page-back-link animate-on-scroll">← Back to Portfolio</Link>
+          <h1 className="page-title animate-on-scroll">Template Page</h1>
+          <p className="page-subtitle animate-on-scroll">
             A foundation for building new sections with consistent styling
           </p>
         </div>
@@ -42,8 +43,8 @@ const TemplatePage = () => {
       {/* Main Content Sections */}
       <main className="template-main">
         {/* Hero-style Section */}
-        <section id="hero-section" className="template-section hero-style">
-          <div className="container">
+        <section id="hero-section" className="page-section hero-style">
+          <div className="page-container">
             <div className="section-content grid-layout">
               <div className="content-text animate-on-scroll">
                 <h2 className="section-title">Hero Style Section</h2>
@@ -67,22 +68,22 @@ const TemplatePage = () => {
         </section>
 
         {/* Content Section */}
-        <section id="content-section" className="template-section content-style">
-          <div className="container">
+        <section id="content-section" className="page-section content-style">
+          <div className="page-container">
             <h2 className="section-title animate-on-scroll">Content Section</h2>
             <p className="section-subtitle animate-on-scroll">
               Standard section layout for regular content areas
             </p>
-            <div className="content-grid animate-on-scroll">
-              <div className="content-card">
+            <div className="content-grid-3 animate-on-scroll">
+              <div className="content-card animate-on-scroll">
                 <h3>Feature One</h3>
                 <p>Description of your feature or content item.</p>
               </div>
-              <div className="content-card">
+              <div className="content-card animate-on-scroll">
                 <h3>Feature Two</h3>
                 <p>Another feature or content item description.</p>
               </div>
-              <div className="content-card">
+              <div className="content-card animate-on-scroll">
                 <h3>Feature Three</h3>
                 <p>Third feature or content item description.</p>
               </div>
@@ -91,8 +92,8 @@ const TemplatePage = () => {
         </section>
 
         {/* Data Section */}
-        <section id="data-section" className="template-section data-style">
-          <div className="container">
+        <section id="data-section" className="page-section data-style">
+          <div className="page-container">
             <h2 className="section-title animate-on-scroll">Data Section</h2>
             <p className="section-subtitle animate-on-scroll">
               Structured layout for data-heavy content like tables, forms, or interactive elements
@@ -129,8 +130,8 @@ const TemplatePage = () => {
         </section>
 
         {/* Interactive Section */}
-        <section id="interactive-section" className="template-section interactive-style">
-          <div className="container">
+        <section id="interactive-section" className="page-section interactive-style">
+          <div className="page-container">
             <h2 className="section-title animate-on-scroll">Interactive Section</h2>
             <p className="section-subtitle animate-on-scroll">
               Space for interactive elements like forms, tools, or dynamic content

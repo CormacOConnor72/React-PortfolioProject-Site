@@ -1,0 +1,249 @@
+/* Shared Container System - Extracted from App.css for reuse across all pages */
+
+/* Base container matching main page exactly */
+.page-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  /* Enhanced centering with viewport manager integration */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Container responsive breakpoints - exact match to App.css */
+@media (min-width: 375px) {
+  .page-container {
+    padding: 0 1rem;
+  }
+}
+
+@media (min-width: 640px) {
+  .page-container {
+    padding: 0 1.5rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .page-container {
+    padding: 0 2rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  .page-container {
+    padding: 0 3rem;
+  }
+}
+
+@media (min-width: 1600px) {
+  .page-container {
+    padding: 0 4rem;
+    max-width: 1800px;
+  }
+}
+
+@media (min-width: 2000px) {
+  .page-container {
+    padding: 0 6rem;
+    max-width: 2200px;
+  }
+}
+
+@media (min-width: 2560px) {
+  .page-container {
+    padding: 0 clamp(8rem, 5vw, 15rem);
+    max-width: clamp(2800px, 85vw, 5000px);
+  }
+}
+
+/* Section padding system - exact match to App.css */
+.page-section {
+  padding: 3rem 0;
+}
+
+@media (min-width: 640px) {
+  .page-section {
+    padding: 4rem 0;
+  }
+}
+
+@media (min-width: 768px) {
+  .page-section {
+    padding: 6rem 0;
+  }
+}
+
+@media (min-width: 1200px) {
+  .page-section {
+    padding: 8rem 0;
+  }
+}
+
+/* Page header standardized styling */
+.page-header {
+  background: var(--primary-color);
+  color: white;
+  padding: 4rem 0 6rem;
+  position: relative;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.page-header .page-container {
+  align-items: flex-start;
+  gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    padding: 2rem 0 4rem;
+  }
+}
+
+/* Page title and subtitle standardization */
+.page-title {
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.page-subtitle {
+  font-size: clamp(1.1rem, 3vw, 1.4rem);
+  margin: 0;
+  opacity: 0.9;
+  max-width: 600px;
+  line-height: 1.5;
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+/* Back link standardization */
+.page-back-link {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.page-back-link:hover {
+  color: white;
+  transform: translateX(-2px);
+}
+
+/* Content grid system using dynamic viewport properties */
+.content-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(var(--dynamic-min-width, 280px), 100%), 1fr));
+  gap: 2rem;
+  transition: var(--grid-transition);
+  width: 100%;
+}
+
+/* Alternative grid sizes for different content types */
+.content-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(400px, 100%), 1fr));
+  gap: 2rem;
+  transition: var(--grid-transition);
+  width: 100%;
+}
+
+.content-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+  gap: 2rem;
+  transition: var(--grid-transition);
+  width: 100%;
+}
+
+/* Responsive grid adjustments */
+@media (max-width: 768px) {
+  .content-grid,
+  .content-grid-2,
+  .content-grid-3 {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+/* Card standardization */
+.content-card {
+  background: var(--background);
+  border-radius: var(--border-radius);
+  padding: 2rem;
+  border: 1px solid var(--border-color);
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.content-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+@media (max-width: 768px) {
+  .content-card {
+    padding: 1.5rem;
+  }
+}
+
+/* Animation classes - consistent across all pages */
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s ease-out;
+}
+
+.animate-on-scroll.animate {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Page transition effect */
+.page-transition {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s ease-out;
+}
+
+.page-transition.page-loaded {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Viewport manager integration classes */
+.narrow-viewport .content-grid,
+.narrow-viewport .content-grid-2,
+.narrow-viewport .content-grid-3 {
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+.very-narrow-viewport .page-container {
+  padding: 0 0.75rem;
+}
+
+.in-app-browser .page-header {
+  padding: 3rem 0 4rem;
+}
+
+.in-app-browser .page-section {
+  padding: 4rem 0;
+}
+
+@media (max-width: 768px) {
+  .in-app-browser .page-section {
+    padding: 3rem 0;
+  }
+}
