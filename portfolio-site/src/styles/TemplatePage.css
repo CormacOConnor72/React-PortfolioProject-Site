@@ -1,0 +1,431 @@
+/* Template Page - Foundation CSS using your existing design system */
+
+.template-page {
+  min-height: 100vh;
+  background: var(--background);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s ease-out;
+}
+
+.template-page.page-loaded {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Header Section */
+.template-header {
+  background: var(--primary-color);
+  color: white;
+  padding: 4rem 0 6rem;
+  position: relative;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.template-header .container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.back-link {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.back-link:hover {
+  color: white;
+  transform: translateX(-2px);
+}
+
+.template-title {
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.template-subtitle {
+  font-size: clamp(1.1rem, 3vw, 1.4rem);
+  margin: 0;
+  opacity: 0.9;
+  max-width: 600px;
+  line-height: 1.5;
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+/* Main Content */
+.template-main {
+  position: relative;
+}
+
+/* Section Base Styles - Inherit from App.css */
+.template-section {
+  padding: 6rem 0;
+  position: relative;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.template-section:last-child {
+  border-bottom: none;
+}
+
+@media (max-width: 768px) {
+  .template-section {
+    padding: 4rem 0;
+  }
+}
+
+/* Hero Style Section */
+.hero-style {
+  background: var(--background);
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+}
+
+.grid-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3rem;
+  align-items: center;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .grid-layout {
+    grid-template-columns: 1.2fr 1fr;
+    gap: 4rem;
+  }
+  
+  .content-text {
+    text-align: left;
+  }
+}
+
+.content-text {
+  text-align: center;
+}
+
+.content-visual {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.visual-placeholder {
+  width: min(300px, 80vw);
+  height: min(300px, 80vw);
+  border: 2px dashed var(--border-color);
+  border-radius: var(--border-radius);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  background: var(--background-secondary);
+  transition: var(--transition);
+}
+
+.visual-placeholder:hover {
+  border-color: var(--primary-color);
+  background: var(--background-tertiary);
+}
+
+.visual-placeholder span {
+  font-size: 4rem;
+}
+
+.visual-placeholder p {
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin: 0;
+}
+
+/* Section Actions */
+.section-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+@media (min-width: 480px) {
+  .section-actions {
+    flex-direction: row;
+    justify-content: center;
+    gap: 1.5rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .section-actions {
+    justify-content: flex-start;
+  }
+}
+
+/* Content Style Section */
+.content-style {
+  background: var(--background-secondary);
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+  transition: var(--grid-transition);
+}
+
+.content-card {
+  background: var(--background);
+  padding: 2rem;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
+  transition: var(--transition);
+}
+
+.content-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.content-card h3 {
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.content-card p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Data Style Section */
+.data-style {
+  background: var(--background);
+}
+
+.data-container {
+  margin-top: 3rem;
+  background: var(--background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+
+.data-table-wrapper {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.data-table th,
+.data-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.data-table th {
+  background: var(--background-secondary);
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.data-table td {
+  color: var(--text-secondary);
+}
+
+.data-table tbody tr:hover {
+  background: var(--background-secondary);
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.status {
+  padding: 0.25rem 0.75rem;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status.active {
+  background: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
+}
+
+.status.pending {
+  background: rgba(251, 191, 36, 0.1);
+  color: #f59e0b;
+}
+
+.btn-small {
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-small:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+/* Interactive Style Section */
+.interactive-style {
+  background: var(--background-tertiary);
+}
+
+.interactive-content {
+  margin-top: 3rem;
+}
+
+.tool-container {
+  background: var(--background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+
+.tool-controls {
+  display: flex;
+  background: var(--background-secondary);
+  border-bottom: 1px solid var(--border-color);
+  overflow-x: auto;
+}
+
+.tool-btn {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap;
+  min-width: max-content;
+}
+
+.tool-btn:hover {
+  background: var(--background);
+  color: var(--text-primary);
+}
+
+.tool-btn.active {
+  background: var(--primary-color);
+  color: white;
+}
+
+.tool-display {
+  padding: 2rem;
+}
+
+.tool-output {
+  min-height: 200px;
+  padding: 2rem;
+  background: var(--background-secondary);
+  border: 2px dashed var(--border-color);
+  border-radius: var(--border-radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.tool-output p {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+/* Animation Classes */
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s ease-out;
+}
+
+.animate-on-scroll.animate {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .template-header {
+    padding: 2rem 0 4rem;
+  }
+  
+  .template-title {
+    font-size: 2.5rem;
+  }
+  
+  .template-subtitle {
+    font-size: 1.1rem;
+  }
+  
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .tool-controls {
+    flex-direction: column;
+  }
+  
+  .tool-btn {
+    text-align: center;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .tool-btn:last-child {
+    border-bottom: none;
+  }
+}
+
+/* Viewport Manager Integration */
+.narrow-viewport .content-grid {
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+.very-narrow-viewport .data-table th,
+.very-narrow-viewport .data-table td {
+  padding: 0.75rem 0.5rem;
+  font-size: 0.9rem;
+}
+
+/* In-app browser adjustments */
+.in-app-browser .template-section {
+  padding: 4rem 0;
+}
+
+.in-app-browser .template-header {
+  padding: 3rem 0 4rem;
+}
