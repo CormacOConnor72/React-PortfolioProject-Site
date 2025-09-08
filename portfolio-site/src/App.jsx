@@ -3,10 +3,9 @@ import Header from './components/Header';
 import Hero from './components/Hero';
 import About from './components/About';
 import Projects from './components/Projects';
-import DataManager from './components/DataManager';
-import Wheel from './components/Wheel';
 import Contact from './components/Contact';
 import Info from './components/Info';
+import Data from './components/Data';
 import './App.css';
 
 // Main portfolio page component
@@ -20,12 +19,6 @@ const MainPage = () => (
     </section>
     <section id="projects">
       <Projects />
-    </section>
-    <section id="data">
-      <DataManager />
-    </section>
-    <section id="wheel">
-      <Wheel />
     </section>
     <section id="contact">
       <Contact />
@@ -45,6 +38,7 @@ function App() {
             </>
           } />
           <Route path="/info" element={<Info />} />
+          <Route path="/data" element={<Data />} />
         </Routes>
       </div>
     </Router>
