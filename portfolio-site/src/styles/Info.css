@@ -1,30 +1,77 @@
-/* Info Section Styles */
-.info-section {
+/* Info Page - Using template foundation structure */
+
+.info-page {
   min-height: 100vh;
-  padding: 120px 0 80px;
-  background: linear-gradient(135deg, var(--bg-color) 0%, var(--card-bg) 100%);
-}
-
-.info-content {
+  background: var(--background);
   opacity: 0;
-  transform: translateY(50px);
-  transition: all 0.8s ease-out;
+  transform: translateY(20px);
+  transition: all 0.6s ease-out;
 }
 
-.info-content.animate {
+.info-page.page-loaded {
   opacity: 1;
   transform: translateY(0);
 }
 
+/* Header Section - Following template pattern */
+.info-header {
+  background: var(--primary-color);
+  color: white;
+  padding: 4rem 0 6rem;
+  position: relative;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.info-header .container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.back-link {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.back-link:hover {
+  color: white;
+  transform: translateX(-2px);
+}
+
 .info-title {
-  font-size: 3rem;
+  font-size: clamp(2.5rem, 6vw, 4rem);
   font-weight: 700;
-  text-align: center;
-  margin-bottom: 3rem;
-  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  margin: 0;
+  line-height: 1.2;
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.info-subtitle {
+  font-size: clamp(1.1rem, 3vw, 1.4rem);
+  margin: 0;
+  opacity: 0.9;
+  max-width: 600px;
+  line-height: 1.5;
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+/* Main Content */
+.info-main {
+  position: relative;
+}
+
+.info-section {
+  padding: 6rem 0;
+  background: var(--background);
 }
 
 .info-grid {
@@ -39,12 +86,11 @@
 }
 
 .info-card {
-  background: var(--card-bg);
-  border-radius: 20px;
+  background: var(--background);
+  border-radius: var(--border-radius);
   padding: 2rem;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.3s ease;
+  border: 1px solid var(--border-color);
+  transition: var(--transition);
   position: relative;
   overflow: hidden;
 }
@@ -60,8 +106,8 @@
 }
 
 .info-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
 }
 
 .info-icon {
@@ -118,15 +164,34 @@
   margin: 0;
 }
 
+/* Animation Classes - Consistent with template */
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s ease-out;
+}
+
+.animate-on-scroll.animate {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
-  .info-section {
-    padding: 100px 0 60px;
+  .info-header {
+    padding: 2rem 0 4rem;
   }
 
   .info-title {
     font-size: 2.5rem;
-    margin-bottom: 2rem;
+  }
+  
+  .info-subtitle {
+    font-size: 1.1rem;
+  }
+
+  .info-section {
+    padding: 4rem 0;
   }
 
   .info-grid {

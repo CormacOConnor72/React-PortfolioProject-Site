@@ -6,6 +6,7 @@ import Projects from './components/Projects';
 import Contact from './components/Contact';
 import Info from './components/Info';
 import Data from './components/Data';
+import TemplatePage from './components/TemplatePage';
 import './App.css';
 
 // Main portfolio page component
@@ -39,6 +40,7 @@ function App() {
           } />
           <Route path="/info" element={<Info />} />
           <Route path="/data" element={<Data />} />
+          <Route path="/template" element={<TemplatePage />} />
         </Routes>
       </div>
     </Router>

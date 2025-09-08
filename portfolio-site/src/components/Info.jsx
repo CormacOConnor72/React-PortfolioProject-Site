@@ -1,157 +1,166 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import '../styles/Info.css';
 
 const Info = () => {
-  const sectionRef = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
 
-  // Intersection Observer for animations
   useEffect(() => {
-    const observerOptions = {
-      threshold: 0.1,
-      rootMargin: '0px 0px -50px 0px'
-    };
+    // Intersection Observer for animations
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animate');
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('animate');
-        }
-      });
-    }, observerOptions);
+    const animatedElements = document.querySelectorAll('.animate-on-scroll');
+    animatedElements.forEach((el) => observer.observe(el));
 
-    if (sectionRef.current) observer.observe(sectionRef.current);
+    setIsVisible(true);
 
     return () => observer.disconnect();
   }, []);
 
   return (
-    <section className="info-section">
-      <div className="container">
-        <div ref={sectionRef} className="info-content">
-          <h1 className="info-title">Personal Information</h1>
+    <div className={`info-page ${isVisible ? 'page-loaded' : ''}`}>
+      <header className="info-header">
+        <div className="container">
+          <Link to="/" className="back-link animate-on-scroll">← Back to Portfolio</Link>
+          <h1 className="info-title animate-on-scroll">Personal Information</h1>
+          <p className="info-subtitle animate-on-scroll">
+            Get to know more about me, my background, and interests
+          </p>
+        </div>
+      </header>
+
+      <main className="info-main">
+        <section className="info-section">
+          <div className="container">
+            <div className="info-content animate-on-scroll">
           
-          <div className="info-grid">
-            <div className="info-card">
-              <div className="info-icon">👨‍💻</div>
-              <h2>Basic Information</h2>
+              <div className="info-grid">
+                <div className="info-card animate-on-scroll">
+                  <div className="info-icon">👨‍💻</div>
+                  <h2>Basic Information</h2>
               <div className="info-details">
                 <div className="info-item">
                   <strong>Name:</strong> Cormac O&apos;Connor
                 </div>
                 <div className="info-item">
-                  <strong>Age:</strong> 22 (template)
+                  <strong>Age:</strong> 23 
                 </div>
                 <div className="info-item">
-                  <strong>Location:</strong> Dublin, Ireland (template)
+                  <strong>Location:</strong> Amstelveen, North Holland
                 </div>
                 <div className="info-item">
-                  <strong>Occupation:</strong> Full Stack Developer (template)
+                  <strong>Occupation:</strong> IT Systems Engineer
                 </div>
               </div>
             </div>
 
-            <div className="info-card">
-              <div className="info-icon">🎓</div>
-              <h2>Education</h2>
+                <div className="info-card animate-on-scroll">
+                  <div className="info-icon">🎓</div>
+                  <h2>Education</h2>
               <div className="info-details">
                 <div className="info-item">
-                  <strong>Degree:</strong> Computer Science (template)
+                  <strong>Degree:</strong> Computer Science 
                 </div>
                 <div className="info-item">
-                  <strong>University:</strong> Trinity College Dublin (template)
+                  <strong>University:</strong> University Of Limerick
                 </div>
                 <div className="info-item">
-                  <strong>Graduation:</strong> 2024 (template)
+                  <strong>Graduation:</strong> 2024 
                 </div>
                 <div className="info-item">
-                  <strong>GPA:</strong> 3.8/4.0 (template)
+                  <strong>GPA:</strong> 3.2/4.0 
                 </div>
               </div>
             </div>
 
-            <div className="info-card">
-              <div className="info-icon">💼</div>
-              <h2>Professional</h2>
+                <div className="info-card animate-on-scroll">
+                  <div className="info-icon">💼</div>
+                  <h2>Professional</h2>
               <div className="info-details">
                 <div className="info-item">
-                  <strong>Experience:</strong> 3+ years (template)
+                  <strong>Experience:</strong> 3+ years in the technology sector
                 </div>
                 <div className="info-item">
-                  <strong>Specialization:</strong> React, Node.js, AWS (template)
+                  <strong>Specialization:</strong> React, Node.js, AWS 
                 </div>
                 <div className="info-item">
-                  <strong>Current Role:</strong> Senior Developer (template)
+                  <strong>Current Role:</strong> IT Systems Engineer
                 </div>
                 <div className="info-item">
-                  <strong>Company:</strong> Tech Solutions Inc. (template)
+                  <strong>Company:</strong> John Paul Construction
                 </div>
               </div>
             </div>
 
-            <div className="info-card">
-              <div className="info-icon">🌟</div>
-              <h2>Interests</h2>
+                <div className="info-card animate-on-scroll">
+                  <div className="info-icon">🌟</div>
+                  <h2>Interests</h2>
               <div className="info-details">
                 <div className="info-item">
-                  <strong>Hobbies:</strong> Coding, Gaming, Photography (template)
+                  <strong>Hobbies:</strong> Coding, Gaming, 3D-Printing, DND
                 </div>
                 <div className="info-item">
-                  <strong>Sports:</strong> Football, Tennis (template)
+                  <strong>Sports:</strong> Climbing, Running, Karate, BJJ
                 </div>
                 <div className="info-item">
-                  <strong>Music:</strong> Electronic, Rock (template)
+                  <strong>Music:</strong> Electronic, Indie Rock
                 </div>
                 <div className="info-item">
-                  <strong>Travel:</strong> Europe, Asia (template)
+                  <strong>Travel:</strong> Europe
                 </div>
               </div>
             </div>
 
-            <div className="info-card">
-              <div className="info-icon">📞</div>
-              <h2>Contact Details</h2>
+                <div className="info-card animate-on-scroll">
+                  <div className="info-icon">📞</div>
+                  <h2>Contact Details</h2>
               <div className="info-details">
                 <div className="info-item">
-                  <strong>Email:</strong> cormac@example.com (template)
+                  <strong>Email:</strong> cormacoconnor72@outlook.ie
                 </div>
                 <div className="info-item">
-                  <strong>Phone:</strong> +353 1 234 5678 (template)
+                  <strong>LinkedIn:</strong> https://www.linkedin.com/in/cormac-o-connor-705646261/
                 </div>
                 <div className="info-item">
-                  <strong>LinkedIn:</strong> linkedin.com/in/cormac-oconnor (template)
-                </div>
-                <div className="info-item">
-                  <strong>GitHub:</strong> github.com/cormac-dev (template)
+                  <strong>GitHub:</strong> https://github.com/CormacOConnor72
                 </div>
               </div>
             </div>
 
-            <div className="info-card">
-              <div className="info-icon">🏆</div>
-              <h2>Achievements</h2>
+                <div className="info-card animate-on-scroll">
+                  <div className="info-icon">🏆</div>
+                  <h2>Achievements</h2>
               <div className="info-details">
                 <div className="info-item">
                   <strong>Certifications:</strong> AWS Solutions Architect (template)
                 </div>
                 <div className="info-item">
-                  <strong>Awards:</strong> Best Developer 2023 (template)
+                  <strong>Projects:</strong> 50+ completed projects
                 </div>
                 <div className="info-item">
-                  <strong>Projects:</strong> 50+ completed projects (template)
-                </div>
-                <div className="info-item">
-                  <strong>Languages:</strong> English (Native), Irish (Fluent) (template)
+                  <strong>Languages:</strong> English (Native)
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="info-note">
-            <p><em>Note: This information page is for demonstration purposes. All details marked with &quot;(template)&quot; should be updated with actual information.</em></p>
+              <div className="info-note animate-on-scroll">
+                <p><em>Note: This information page is for demonstration purposes.</em></p>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-    </section>
+        </section>
+      </main>
+    </div>
   );
 };
 
