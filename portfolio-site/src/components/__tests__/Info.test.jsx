@@ -52,7 +52,7 @@ describe('Info Component', () => {
   it('has proper section structure', () => {
     renderWithRouter(<Info />)
     
-    const section = document.querySelector('.info-section')
+    const section = document.querySelector('.page-section')
     expect(section).toBeInTheDocument()
     
     const infoGrid = document.querySelector('.info-grid')
@@ -80,7 +80,7 @@ describe('Info Component', () => {
   it('has proper responsive structure', () => {
     renderWithRouter(<Info />)
     
-    const container = document.querySelector('.container')
+    const container = document.querySelector('.page-container')
     expect(container).toBeInTheDocument()
     
     const infoContent = document.querySelector('.info-content')
