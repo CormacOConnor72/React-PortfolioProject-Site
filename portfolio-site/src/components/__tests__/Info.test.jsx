@@ -1,15 +1,24 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import { BrowserRouter } from 'react-router-dom'
 import Info from '../Info'
+
+const renderWithRouter = (component) => {
+  return render(
+    <BrowserRouter>
+      {component}
+    </BrowserRouter>
+  )
+}
 
 describe('Info Component', () => {
   it('renders without crashing', () => {
-    render(<Info />)
+    renderWithRouter(<Info />)
     expect(screen.getByText('Personal Information')).toBeInTheDocument()
   })
 
   it('displays all information sections', () => {
-    render(<Info />)
+    renderWithRouter(<Info />)
     
     expect(screen.getByText('Basic Information')).toBeInTheDocument()
     expect(screen.getByText('Education')).toBeInTheDocument()
@@ -20,14 +29,14 @@ describe('Info Component', () => {
   })
 
   it('displays personal information with correct name', () => {
-    render(<Info />)
+    renderWithRouter(<Info />)
     
     expect(screen.getByText(/Cormac O'Connor/)).toBeInTheDocument()
-    expect(screen.getByText(/22 \(template\)/)).toBeInTheDocument()
+    expect(screen.getByText(/23/)).toBeInTheDocument()
   })
 
   it('shows template indicators', () => {
-    render(<Info />)
+    renderWithRouter(<Info />)
     
     // Check that template indicators are present
     const templateTexts = screen.getAllByText(/\(template\)/)
@@ -35,13 +44,13 @@ describe('Info Component', () => {
   })
 
   it('displays the note about template information', () => {
-    render(<Info />)
+    renderWithRouter(<Info />)
     
     expect(screen.getByText(/Note: This information page is for demonstration purposes/)).toBeInTheDocument()
   })
 
   it('has proper section structure', () => {
-    render(<Info />)
+    renderWithRouter(<Info />)
     
     const section = document.querySelector('.info-section')
     expect(section).toBeInTheDocument()
@@ -54,7 +63,7 @@ describe('Info Component', () => {
   })
 
   it('renders emoji icons for each section', () => {
-    render(<Info />)
+    renderWithRouter(<Info />)
     
     const icons = document.querySelectorAll('.info-icon')
     expect(icons.length).toBe(6)
@@ -69,7 +78,7 @@ describe('Info Component', () => {
   })
 
   it('has proper responsive structure', () => {
-    render(<Info />)
+    renderWithRouter(<Info />)
     
     const container = document.querySelector('.container')
     expect(container).toBeInTheDocument()
