@@ -174,7 +174,9 @@ const Wheel = () => {
     setTimeout(() => {
       const normalizedDegree = totalRotation % 360;
       const segmentSize = 360 / filteredEntries.length;
-      const selectedIndex = Math.floor((360 - normalizedDegree) / segmentSize) % filteredEntries.length;
+      // Adjust for pointer at top (12 o'clock) - add 90 degrees to align properly
+      const adjustedDegree = (normalizedDegree + 90) % 360;
+      const selectedIndex = Math.floor(adjustedDegree / segmentSize) % filteredEntries.length;
       const winner = filteredEntries[selectedIndex];
       
       // Add to spin history
@@ -240,7 +242,8 @@ const Wheel = () => {
     ];
 
     return filteredEntries.map((entry, index) => {
-      const startAngle = index * segmentAngle;
+      // Adjust starting angle to align with pointer at top (subtract 90 degrees)
+      const startAngle = (index * segmentAngle) - 90;
       const endAngle = startAngle + segmentAngle;
       const color = colors[index % colors.length];
       

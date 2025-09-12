@@ -23,17 +23,23 @@
   z-index: 1;
   /* Enhanced centering */
   justify-items: center;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 /* Metrics Dashboard */
 .metrics-dashboard {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(var(--dynamic-min-width, 200px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(var(--dynamic-min-width, 200px), 100%), 1fr));
   gap: 1.5rem;
   margin: 2rem 0;
   opacity: 0;
   transform: translateY(20px);
   animation: fadeInUp 0.6s ease-out 0.3s forwards;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .metric-card {
@@ -191,6 +197,48 @@
   }
 }
 
+/* Very small screens */
+@media (max-width: 375px) {
+  .data-manager-content {
+    padding: 0 0.25rem;
+  }
+  
+  .data-grid-container {
+    margin: 0 -0.25rem;
+    min-width: 450px;
+  }
+  
+  .data-grid-header,
+  .data-grid-row {
+    padding: 0.4rem;
+    font-size: 0.7rem;
+    grid-template-columns: 
+      minmax(60px, 0.8fr)   /* Name */
+      minmax(45px, 0.4fr)   /* Type */
+      minmax(55px, 0.5fr)   /* Who */
+      minmax(80px, 1fr)     /* Why */
+      minmax(55px, 0.4fr)   /* Date */
+      minmax(30px, 0.2fr);  /* Actions */
+  }
+  
+  .metrics-dashboard {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  
+  .metric-card {
+    padding: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: left;
+  }
+  
+  .metric-value {
+    font-size: 1.25rem;
+  }
+}
+
 /* Ultra-wide displays */
 @media (min-width: 3440px) {
   .metrics-dashboard {
@@ -213,6 +261,9 @@
   transform: translateY(30px);
   animation: fadeInUp 0.8s ease-out 0.2s forwards;
   box-shadow: var(--shadow);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .form-section h3 {
@@ -591,6 +642,9 @@
   box-sizing: border-box;
   /* Pre-size container to prevent layout shift */
   min-height: 200px;
+  /* Ensure mobile scroll works properly */
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .data-grid-container::before {
@@ -647,16 +701,17 @@
 .data-grid-row {
   display: grid;
   grid-template-columns: 
-    minmax(120px, 1.2fr)  /* Name */
-    minmax(80px, 0.8fr)   /* Type */
-    minmax(100px, 1fr)    /* Who */
-    minmax(150px, 1.8fr)  /* Why */
-    minmax(100px, 0.8fr)  /* Date */
+    minmax(max(var(--dynamic-min-width, 120px), 120px), 1.2fr)  /* Name */
+    minmax(max(var(--dynamic-min-width, 80px), 80px), 0.8fr)   /* Type */
+    minmax(max(var(--dynamic-min-width, 100px), 100px), 1fr)    /* Who */
+    minmax(max(var(--dynamic-min-width, 150px), 150px), 1.8fr)  /* Why */
+    minmax(max(var(--dynamic-min-width, 100px), 100px), 0.8fr)  /* Date */
     minmax(60px, 0.4fr);  /* Actions */
   gap: 1rem;
   align-items: center;
   position: relative;
   z-index: 1;
+  min-width: fit-content;
 }
 
 .data-grid-header {
@@ -848,147 +903,217 @@
 @media (max-width: 768px) {
   .data-manager-content {
     gap: 2rem;
+    padding: 0 1rem;
   }
   
   .metrics-dashboard {
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(140px, calc(50% - 0.5rem)), 1fr));
     gap: 1rem;
   }
   
   .metric-card {
-    padding: 1rem;
+    padding: 1rem 0.75rem;
   }
   
   .metric-value {
-    font-size: 2rem;
+    font-size: 1.8rem;
   }
   
   .data-controls {
     flex-direction: column;
     align-items: stretch;
     gap: 0.75rem;
+    width: 100%;
   }
   
   .search-input {
     min-width: unset;
     width: 100%;
+    box-sizing: border-box;
   }
   
   .filter-select {
     width: 100%;
+    box-sizing: border-box;
   }
   
-  .form-section {
-    padding: 1.5rem;
-  }
-  
-  .data-grid-container {
-    overflow-x: auto;
-    min-width: 600px; /* Ensure grid doesn't collapse */
-  }
-  
-  .data-grid-header,
-  .data-grid-row {
-    grid-template-columns: 
-      minmax(100px, 1fr)    /* Name */
-      minmax(70px, 0.7fr)   /* Type */
-      minmax(80px, 0.8fr)   /* Who */
-      minmax(120px, 1.5fr)  /* Why */
-      minmax(80px, 0.7fr)   /* Date */
-      minmax(50px, 0.3fr);  /* Actions */
-    gap: 0.5rem;
-    padding: 0.75rem 0.5rem;
-    font-size: 0.9rem;
-  }
-  
-  .name-cell, .who-cell, .why-cell {
-    font-size: 0.85rem;
-  }
-  
-  .type-badge {
-    font-size: 0.7rem;
-    padding: 0.3rem 0.5rem;
-  }
-  
-  .date-cell {
-    font-size: 0.75rem;
-  }
-  
-  .data-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-}
-
-@media (max-width: 480px) {
   .form-section {
     padding: 1rem;
-  }
-  
-  .metrics-dashboard {
-    grid-template-columns: 1fr 1fr;
-    gap: 0.75rem;
-  }
-  
-  .metric-card {
-    padding: 0.75rem;
-  }
-  
-  .metric-value {
-    font-size: 1.75rem;
-  }
-  
-  .metric-label {
-    font-size: 0.8rem;
-  }
-  
-  .types-breakdown {
-    grid-column: 1 / -1;
-  }
-  
-  .search-input {
-    padding: 0.6rem 1rem 0.6rem 2.2rem;
-    font-size: 0.85rem;
-  }
-  
-  .filter-select {
-    padding: 0.6rem 0.8rem;
-    font-size: 0.85rem;
+    margin: 0 -1rem;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
   }
   
   .data-grid-container {
-    min-width: 500px; /* Prevent excessive compression */
+    margin: 0 -1rem;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
   
   .data-grid-header,
   .data-grid-row {
     grid-template-columns: 
-      minmax(80px, 1fr)     /* Name */
+      minmax(90px, 1fr)     /* Name */
       minmax(60px, 0.6fr)   /* Type */
       minmax(70px, 0.7fr)   /* Who */
-      minmax(100px, 1.3fr)  /* Why */
+      minmax(110px, 1.3fr)  /* Why */
       minmax(70px, 0.6fr)   /* Date */
       minmax(40px, 0.3fr);  /* Actions */
-    gap: 0.25rem;
-    padding: 0.5rem 0.25rem;
-    font-size: 0.8rem;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    font-size: 0.85rem;
+    min-width: 500px;
   }
   
-  .name-cell, .who-cell, .why-cell {
+  .grid-cell {
+    padding: 0.25rem;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+  
+  .name-cell, .who-cell {
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  
+  .why-cell {
     font-size: 0.75rem;
+    line-height: 1.3;
   }
   
   .type-badge {
     font-size: 0.65rem;
-    padding: 0.25rem 0.4rem;
+    padding: 0.2rem 0.4rem;
+    white-space: nowrap;
   }
   
   .date-cell {
     font-size: 0.7rem;
+    white-space: nowrap;
   }
   
   .delete-btn {
     padding: 0.4rem;
     font-size: 0.9rem;
+  }
+  
+  .data-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 0 1rem;
+  }
+  
+  .data-header h3 {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .data-manager-content {
+    padding: 0 0.5rem;
+    gap: 1.5rem;
+  }
+  
+  .form-section {
+    padding: 1rem 0.75rem;
+    margin: 0 -0.5rem;
+  }
+  
+  .metrics-dashboard {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+  
+  .metric-card {
+    padding: 0.75rem 0.5rem;
+  }
+  
+  .metric-value {
+    font-size: 1.5rem;
+  }
+  
+  .metric-label {
+    font-size: 0.75rem;
+  }
+  
+  .types-breakdown {
+    grid-column: 1 / -1;
+    padding: 0.5rem;
+  }
+  
+  .search-input {
+    padding: 0.6rem 1rem 0.6rem 2.2rem;
+    font-size: 0.8rem;
+  }
+  
+  .filter-select {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.8rem;
+  }
+  
+  .data-grid-container {
+    margin: 0 -0.5rem;
+    min-width: 480px;
+  }
+  
+  .data-grid-header,
+  .data-grid-row {
+    grid-template-columns: 
+      minmax(70px, 0.9fr)   /* Name */
+      minmax(50px, 0.5fr)   /* Type */
+      minmax(60px, 0.6fr)   /* Who */
+      minmax(90px, 1.2fr)   /* Why */
+      minmax(60px, 0.5fr)   /* Date */
+      minmax(35px, 0.25fr); /* Actions */
+    gap: 0.25rem;
+    padding: 0.5rem;
+    font-size: 0.75rem;
+  }
+  
+  .grid-cell {
+    padding: 0.125rem;
+  }
+  
+  .name-cell, .who-cell {
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+  
+  .why-cell {
+    font-size: 0.65rem;
+    line-height: 1.2;
+  }
+  
+  .type-badge {
+    font-size: 0.55rem;
+    padding: 0.15rem 0.3rem;
+    border-radius: 8px;
+  }
+  
+  .date-cell {
+    font-size: 0.65rem;
+    white-space: nowrap;
+  }
+  
+  .delete-btn {
+    padding: 0.3rem;
+    font-size: 0.8rem;
+    min-width: 30px;
+    height: 30px;
+  }
+  
+  .data-header h3 {
+    font-size: 1.1rem;
+  }
+  
+  .clear-all-btn {
+    font-size: 0.8rem;
+    padding: 0.5rem 0.75rem;
   }
 }

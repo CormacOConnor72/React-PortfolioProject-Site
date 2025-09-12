@@ -500,11 +500,12 @@
 /* Wheel Pointer */
 .wheel-pointer {
   position: absolute;
-  top: -20px;
+  top: -25px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
   filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+  pointer-events: none;
 }
 
 /* Spin Button */
