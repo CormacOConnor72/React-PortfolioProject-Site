@@ -44,6 +44,7 @@ Follow the detailed [MANUAL_DEPLOYMENT_GUIDE.md](./MANUAL_DEPLOYMENT_GUIDE.md) f
 ### **Option 1: Automated AWS CLI Deployment (NEW - Recommended)**
 
 **Prerequisites:**
+- `zip` utility installed (`sudo apt install zip` on Ubuntu/Debian)
 - AWS CLI configured (`aws configure`)
 - Lambda functions exist in your AWS account
 

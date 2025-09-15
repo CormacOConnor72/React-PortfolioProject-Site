@@ -27,6 +27,15 @@ log_success() { echo -e "${GREEN}✅ $1${NC}"; }
 log_warning() { echo -e "${YELLOW}⚠️  $1${NC}"; }
 log_error() { echo -e "${RED}❌ $1${NC}"; }
 
+# Check prerequisites
+if ! command -v zip >/dev/null 2>&1; then
+    log_error "zip is required but not installed. Please install zip:"
+    echo "  Ubuntu/Debian: sudo apt install zip"
+    echo "  macOS: zip is pre-installed"
+    echo "  CentOS/RHEL: sudo yum install zip"
+    exit 1
+fi
+
 # Check if AWS CLI is configured
 if ! aws sts get-caller-identity >/dev/null 2>&1; then
     log_error "AWS CLI not configured. Please run 'aws configure' first."
@@ -102,6 +111,11 @@ test_function() {
     rm -f /tmp/lambda_test_output.json
 }
 
+# Clean up old packages and artifacts
+log_info "Cleaning up old deployment artifacts..."
+rm -f *.zip *.tar.gz
+rm -rf temp_* backups/temp_*
+
 # Create deployment packages
 log_info "Creating deployment packages..."
 for FUNCTION_NAME in "${FUNCTIONS[@]}"; do
@@ -117,22 +131,67 @@ for FUNCTION_NAME in "${FUNCTIONS[@]}"; do
     rm -rf "$TEMP_DIR"  # Clean up any existing temp dir
     mkdir -p "$TEMP_DIR"
 
-    # Copy function code
+    # Copy function code (main JavaScript file)
     cp "$FUNCTION_NAME.js" "$TEMP_DIR/index.js"
+
+    # Copy package.json
     cp package.json "$TEMP_DIR/"
+
+    # Copy any additional files that might be needed
+    # Check for common additional files
+    for additional_file in "*.json" "*.yml" "*.yaml" "*.txt"; do
+        if ls $additional_file 1> /dev/null 2>&1 && [ "$additional_file" != "package.json" ]; then
+            log_info "Including additional files: $additional_file"
+            cp $additional_file "$TEMP_DIR/" 2>/dev/null || true
+        fi
+    done
+
+    # Check for function-specific configuration files
+    if [ -f "$FUNCTION_NAME.config.json" ]; then
+        log_info "Including function-specific config: $FUNCTION_NAME.config.json"
+        cp "$FUNCTION_NAME.config.json" "$TEMP_DIR/"
+    fi
+
+    # Check for shared utility files
+    if [ -d "utils" ]; then
+        log_info "Including utils directory"
+        cp -r utils "$TEMP_DIR/"
+    fi
+
+    if [ -d "lib" ]; then
+        log_info "Including lib directory"
+        cp -r lib "$TEMP_DIR/"
+    fi
+
+    if [ -d "common" ]; then
+        log_info "Including common directory"
+        cp -r common "$TEMP_DIR/"
+    fi
 
     # Install dependencies in temp directory
     cd "$TEMP_DIR"
-    if ! npm install --production --no-package-lock; then
+    log_info "Installing dependencies for $FUNCTION_NAME..."
+    if ! npm install --production --no-package-lock --silent; then
         log_error "Failed to install dependencies for $FUNCTION_NAME"
         cd ..
         rm -rf "$TEMP_DIR"
         continue
     fi
 
-    # Create ZIP package
-    if zip -r "../$FUNCTION_NAME.zip" . >/dev/null; then
-        log_success "Package created: $FUNCTION_NAME.zip ($(du -h ../$FUNCTION_NAME.zip | cut -f1))"
+    # Remove unnecessary files from package to keep it lean
+    rm -f package-lock.json
+    rm -rf .npm
+    find node_modules -name "*.txt" -delete 2>/dev/null || true
+    find node_modules -name "LICENSE*" -delete 2>/dev/null || true
+    find node_modules -name "CHANGELOG*" -delete 2>/dev/null || true
+    find node_modules -name "*.map" -delete 2>/dev/null || true
+
+    # Create ZIP package with better compression
+    log_info "Creating ZIP package for $FUNCTION_NAME..."
+    if zip -r -q -9 "../$FUNCTION_NAME.zip" .; then
+        PACKAGE_SIZE=$(du -h "../$FUNCTION_NAME.zip" | cut -f1)
+        FILE_COUNT=$(find . -type f | wc -l)
+        log_success "Package created: $FUNCTION_NAME.zip ($PACKAGE_SIZE, $FILE_COUNT files)"
     else
         log_error "Failed to create ZIP package for $FUNCTION_NAME"
     fi
@@ -148,8 +207,8 @@ if [ "$DEPLOY_TO_AWS" = "package" ]; then
     echo ""
     echo "📋 Next steps:"
     echo "1. Run './deploy.sh deploy' to deploy via AWS CLI"
-    echo "2. Or upload each .zip file manually in AWS Console"
-    echo "3. Or use the manual deployment guide"
+    echo "2. Or upload each .zip file manually in AWS Console (see guides/MANUAL_DEPLOYMENT_GUIDE.md)"
+    echo "3. Or use the comprehensive deployment guide (see guides/DEPLOYMENT_GUIDE.md)"
     echo ""
     echo "📦 Created packages:"
     for FUNCTION_NAME in "${FUNCTIONS[@]}"; do
