@@ -8,7 +8,7 @@ import Info from './components/Info';
 import Data from './components/Data';
 import TemplatePage from './components/TemplatePage';
 import './App.css';
-
+//test
 // Main portfolio page component
 const MainPage = () => (
   <main>
