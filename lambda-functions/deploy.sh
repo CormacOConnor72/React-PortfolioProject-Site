@@ -61,6 +61,25 @@ discover_lambda_names() {
     done
 }
 
+# Function to map local function names to AWS function names
+get_aws_function_name() {
+    local local_name=$1
+    case $local_name in
+        "portfolioCreateEntry")
+            echo "portfolio-create-entry"
+            ;;
+        "portfolioDeleteEntry")
+            echo "portfolio-delete-entry"
+            ;;
+        "portfolioGetEntries")
+            echo "portfolio-get-entries"
+            ;;
+        *)
+            echo "$local_name"
+            ;;
+    esac
+}
+
 # Function to create backup of existing Lambda function
 backup_function() {
     local aws_function_name=$1
@@ -78,12 +97,14 @@ backup_function() {
 
 # Function to test Lambda function after deployment
 test_function() {
-    local function_name=$1
-    log_info "Testing $function_name..."
+    local local_function_name=$1
+    local aws_function_name=$(get_aws_function_name "$local_function_name")
 
-    # Create a test event based on function type
-    local test_event=""
-    case $function_name in
+    log_info "Testing $local_function_name (AWS: $aws_function_name)..."
+
+    # Create a test payload based on function type
+    local test_payload=""
+    case $local_function_name in
         *"recordSpin"*)
             test_payload='{"body": "{\"entryId\":\"test\",\"entryName\":\"Test Entry\",\"sessionId\":\"test_session\"}"}'
             ;;
@@ -108,14 +129,14 @@ test_function() {
             ;;
     esac
 
-    if aws lambda invoke --function-name "$function_name" --payload "$test_payload" --cli-binary-format raw-in-base64-out /tmp/lambda_test_output.json --region eu-north-1 >/dev/null 2>&1; then
+    if aws lambda invoke --function-name "$aws_function_name" --payload "$test_payload" --cli-binary-format raw-in-base64-out /tmp/lambda_test_output.json --region eu-north-1 >/dev/null 2>&1; then
         if grep -q '"statusCode": 200' /tmp/lambda_test_output.json 2>/dev/null || grep -q '"statusCode": 201' /tmp/lambda_test_output.json 2>/dev/null; then
-            log_success "Test passed for $function_name"
+            log_success "Test passed for $aws_function_name"
         else
-            log_warning "Test completed but may have issues. Check CloudWatch logs for $function_name"
+            log_warning "Test completed but may have issues. Check CloudWatch logs for $aws_function_name"
         fi
     else
-        log_error "Test failed for $function_name"
+        log_error "Test failed for $aws_function_name"
     fi
     rm -f /tmp/lambda_test_output.json
 }
@@ -248,8 +269,9 @@ if [ "$DEPLOY_TO_AWS" = "deploy" ]; then
         echo ""
         log_info "Deploying $FUNCTION_NAME..."
 
-        # Try exact name first
-        AWS_FUNCTION_NAME="$FUNCTION_NAME"
+        # Get the correct AWS function name
+        AWS_FUNCTION_NAME=$(get_aws_function_name "$FUNCTION_NAME")
+        log_info "Local: $FUNCTION_NAME → AWS: $AWS_FUNCTION_NAME"
 
         # Create backup
         backup_function "$AWS_FUNCTION_NAME" "$FUNCTION_NAME"
