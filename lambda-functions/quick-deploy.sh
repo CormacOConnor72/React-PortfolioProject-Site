@@ -29,13 +29,21 @@ error() {
     echo -e "${RED}❌ $1${NC}"
 }
 
-# Quick AWS check
+# Quick prerequisites check
+if ! command -v zip >/dev/null 2>&1; then
+    error "zip not installed. Run: sudo apt install zip"
+    exit 1
+fi
+
 if ! aws sts get-caller-identity >/dev/null 2>&1; then
     error "AWS CLI not configured"
     exit 1
 fi
 
 log "🚀 Quick deploying Lambda functions..."
+
+# Clean up old packages
+rm -f *.zip *.tar.gz 2>/dev/null || true
 
 # Quick package and deploy
 for func in "${FUNCTIONS[@]}"; do
@@ -48,8 +56,26 @@ for func in "${FUNCTIONS[@]}"; do
         cp "$func.js" "temp_$func/index.js"
         cp package.json "temp_$func/"
 
-        # Install and zip
-        (cd "temp_$func" && npm install --silent --production --no-package-lock && zip -rq "../$func.zip" .)
+        # Copy additional files if they exist
+        for additional in *.json *.yml *.yaml; do
+            if [ -f "$additional" ] && [ "$additional" != "package.json" ]; then
+                cp "$additional" "temp_$func/" 2>/dev/null || true
+            fi
+        done
+
+        # Copy common directories if they exist
+        for dir in utils lib common; do
+            if [ -d "$dir" ]; then
+                cp -r "$dir" "temp_$func/" 2>/dev/null || true
+            fi
+        done
+
+        # Install and zip with cleanup
+        (cd "temp_$func" && npm install --silent --production --no-package-lock && \
+         rm -f package-lock.json && \
+         find node_modules -name "*.md" -delete 2>/dev/null || true && \
+         find node_modules -name "*.map" -delete 2>/dev/null || true && \
+         zip -rq9 "../$func.zip" .)
         rm -rf "temp_$func"
 
         # Deploy if function exists in AWS
