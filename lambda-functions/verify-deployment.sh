@@ -7,7 +7,7 @@ set -e
 
 # Configuration
 API_BASE_URL="https://n9x7n282md.execute-api.us-east-1.amazonaws.com/prod"
-FUNCTIONS=("recordSpin" "getSpinHistory" "getGlobalMetrics" "clearSpinHistory")
+FUNCTIONS=("recordSpin" "getSpinHistory" "getGlobalMetrics" "clearSpinHistory" "portfolio-create-entry" "portfolio-delete-entry" "portfolio-get-entries")
 TEMP_DIR="/tmp/lambda_verification_$$"
 
 # Colors for output
@@ -118,25 +118,37 @@ for FUNCTION_NAME in "${FUNCTIONS[@]}"; do
         # Create appropriate test payload
         case $FUNCTION_NAME in
             "recordSpin")
-                TEST_PAYLOAD='{"body": "{\"entryId\":\"test_verify_123\",\"entryName\":\"Verification Test\",\"entryType\":\"Test\",\"entryWho\":\"VerificationScript\",\"sessionId\":\"verify_session_123\"}"}'
                 run_test "$FUNCTION_NAME Lambda" \
-                    "aws lambda invoke --function-name $FUNCTION_NAME --payload '$TEST_PAYLOAD' $TEMP_DIR/lambda_response.json && cat $TEMP_DIR/lambda_response.json" \
+                    "aws lambda invoke --function-name $FUNCTION_NAME --payload '{\"body\": \"{\\\"entryId\\\":\\\"test_verify_123\\\",\\\"entryName\\\":\\\"Verification Test\\\",\\\"entryType\\\":\\\"Test\\\",\\\"entryWho\\\":\\\"VerificationScript\\\",\\\"sessionId\\\":\\\"verify_session_123\\\"}\"}' --cli-binary-format raw-in-base64-out $TEMP_DIR/lambda_response.json --region eu-north-1 && cat $TEMP_DIR/lambda_response.json" \
                     '"statusCode": 200'
                 ;;
             "getSpinHistory")
-                TEST_PAYLOAD='{"queryStringParameters": {"limit": "5"}}'
                 run_test "$FUNCTION_NAME Lambda" \
-                    "aws lambda invoke --function-name $FUNCTION_NAME --payload '$TEST_PAYLOAD' $TEMP_DIR/lambda_response.json && cat $TEMP_DIR/lambda_response.json" \
+                    "aws lambda invoke --function-name $FUNCTION_NAME --payload '{\"queryStringParameters\": {\"limit\": \"5\"}}' --cli-binary-format raw-in-base64-out $TEMP_DIR/lambda_response.json --region eu-north-1 && cat $TEMP_DIR/lambda_response.json" \
                     '"statusCode": 200'
                 ;;
             "getGlobalMetrics")
-                TEST_PAYLOAD='{}'
                 run_test "$FUNCTION_NAME Lambda" \
-                    "aws lambda invoke --function-name $FUNCTION_NAME --payload '$TEST_PAYLOAD' $TEMP_DIR/lambda_response.json && cat $TEMP_DIR/lambda_response.json" \
-                    '"totalSpins"'
+                    "aws lambda invoke --function-name $FUNCTION_NAME --payload '{}' --cli-binary-format raw-in-base64-out $TEMP_DIR/lambda_response.json --region eu-north-1 && cat $TEMP_DIR/lambda_response.json" \
+                    'totalSpins'
                 ;;
             "clearSpinHistory")
                 log_warning "Skipping destructive test for $FUNCTION_NAME"
+                ;;
+            "portfolio-create-entry")
+                run_test "$FUNCTION_NAME Lambda" \
+                    "aws lambda invoke --function-name $FUNCTION_NAME --payload '{\"body\": \"{\\\"name\\\":\\\"Verification Test Entry\\\",\\\"type\\\":\\\"Test\\\",\\\"who\\\":\\\"VerificationScript\\\",\\\"why\\\":\\\"Testing deployment\\\"}\"}' --cli-binary-format raw-in-base64-out $TEMP_DIR/lambda_response.json --region eu-north-1 && cat $TEMP_DIR/lambda_response.json" \
+                    '"statusCode": 201'
+                ;;
+            "portfolio-delete-entry")
+                run_test "$FUNCTION_NAME Lambda" \
+                    "aws lambda invoke --function-name $FUNCTION_NAME --payload '{\"pathParameters\": {\"id\": \"test-verification-id\"}}' --cli-binary-format raw-in-base64-out $TEMP_DIR/lambda_response.json --region eu-north-1 && cat $TEMP_DIR/lambda_response.json" \
+                    '"statusCode": 200'
+                ;;
+            "portfolio-get-entries")
+                run_test "$FUNCTION_NAME Lambda" \
+                    "aws lambda invoke --function-name $FUNCTION_NAME --payload '{}' --cli-binary-format raw-in-base64-out $TEMP_DIR/lambda_response.json --region eu-north-1 && cat $TEMP_DIR/lambda_response.json" \
+                    '"statusCode": 200'
                 ;;
         esac
     else
@@ -165,6 +177,17 @@ TEST_JSON='{"entryId":"api_test_123","entryName":"API Test Entry","entryType":"T
 run_test "POST /spins endpoint" \
     "curl -s -w '%{http_code}' -X POST '$API_BASE_URL/spins' -H 'Content-Type: application/json' -d '$TEST_JSON'" \
     "200"
+
+# Test GET /entries endpoint
+run_test "GET /entries endpoint" \
+    "curl -s -w '%{http_code}' '$API_BASE_URL/entries'" \
+    "200"
+
+# Test POST /entries endpoint
+ENTRY_JSON='{"name":"API Test Entry","type":"Test","who":"API Tester","why":"Testing API endpoint"}'
+run_test "POST /entries endpoint" \
+    "curl -s -w '%{http_code}' -X POST '$API_BASE_URL/entries' -H 'Content-Type: application/json' -d '$ENTRY_JSON'" \
+    "201"
 
 echo ""
 
@@ -200,14 +223,22 @@ echo ""
 # Test 4: DynamoDB Integration Test
 log_header "DynamoDB Integration Test"
 
-# Check if DynamoDB table exists
-run_test "DynamoDB table existence" \
+# Check if DynamoDB tables exist
+run_test "DynamoDB SpinHistory table existence" \
     "aws dynamodb describe-table --table-name SpinHistory" \
     "TableName"
 
-# Check if we can read from the table
-run_test "DynamoDB read access" \
+run_test "DynamoDB portfolio-data-entries table existence" \
+    "aws dynamodb describe-table --table-name portfolio-data-entries" \
+    "TableName"
+
+# Check if we can read from the tables
+run_test "DynamoDB SpinHistory read access" \
     "aws dynamodb scan --table-name SpinHistory --limit 1" \
+    "Items"
+
+run_test "DynamoDB portfolio-data-entries read access" \
+    "aws dynamodb scan --table-name portfolio-data-entries --limit 1" \
     "Items"
 
 echo ""

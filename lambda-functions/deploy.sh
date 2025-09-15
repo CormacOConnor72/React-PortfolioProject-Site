@@ -8,7 +8,7 @@ set -e
 echo "🚀 Starting Lambda function deployment..."
 
 # Function names (these should match your local .js files)
-FUNCTIONS=("recordSpin" "getSpinHistory" "getGlobalMetrics" "clearSpinHistory")
+FUNCTIONS=("recordSpin" "getSpinHistory" "getGlobalMetrics" "clearSpinHistory" "portfolioCreateEntry" "portfolioDeleteEntry" "portfolioGetEntries")
 
 # Configuration
 DEPLOY_TO_AWS=${1:-"package"}  # "package" or "deploy"
@@ -85,22 +85,31 @@ test_function() {
     local test_event=""
     case $function_name in
         *"recordSpin"*)
-            test_event='{"body": "{\"entryId\":\"test\",\"entryName\":\"Test Entry\",\"sessionId\":\"test_session\"}"}'
+            test_payload='{"body": "{\"entryId\":\"test\",\"entryName\":\"Test Entry\",\"sessionId\":\"test_session\"}"}'
             ;;
         *"getSpinHistory"*)
-            test_event='{"queryStringParameters": {"limit": "5"}}'
+            test_payload='{"queryStringParameters": {"limit": "5"}}'
             ;;
         *"getGlobalMetrics"*)
-            test_event='{}'
+            test_payload='{}'
             ;;
         *"clearSpinHistory"*)
             log_warning "Skipping test for clearSpinHistory (destructive operation)"
             return 0
             ;;
+        *"portfolioCreateEntry"*)
+            test_payload='{"body": "{\"name\":\"Test Entry\",\"type\":\"Test\",\"who\":\"Test User\",\"why\":\"Testing deployment\"}"}'
+            ;;
+        *"portfolioDeleteEntry"*)
+            test_payload='{"pathParameters": {"id": "test-id-for-testing"}}'
+            ;;
+        *"portfolioGetEntries"*)
+            test_payload='{}'
+            ;;
     esac
 
-    if aws lambda invoke --function-name "$function_name" --payload "$test_event" /tmp/lambda_test_output.json >/dev/null 2>&1; then
-        if grep -q '"statusCode": 200' /tmp/lambda_test_output.json 2>/dev/null; then
+    if aws lambda invoke --function-name "$function_name" --payload "$test_payload" --cli-binary-format raw-in-base64-out /tmp/lambda_test_output.json --region eu-north-1 >/dev/null 2>&1; then
+        if grep -q '"statusCode": 200' /tmp/lambda_test_output.json 2>/dev/null || grep -q '"statusCode": 201' /tmp/lambda_test_output.json 2>/dev/null; then
             log_success "Test passed for $function_name"
         else
             log_warning "Test completed but may have issues. Check CloudWatch logs for $function_name"
@@ -278,5 +287,8 @@ if [ "$DEPLOY_TO_AWS" = "deploy" ]; then
     echo "   - POST https://n9x7n282md.execute-api.us-east-1.amazonaws.com/prod/spins"
     echo "   - GET  https://n9x7n282md.execute-api.us-east-1.amazonaws.com/prod/spins"
     echo "   - GET  https://n9x7n282md.execute-api.us-east-1.amazonaws.com/prod/metrics"
-    echo "3. Test your website's wheel functionality"
+    echo "   - GET  https://n9x7n282md.execute-api.us-east-1.amazonaws.com/prod/entries"
+    echo "   - POST https://n9x7n282md.execute-api.us-east-1.amazonaws.com/prod/entries"
+    echo "   - DELETE https://n9x7n282md.execute-api.us-east-1.amazonaws.com/prod/entries/{id}"
+    echo "3. Test your website's wheel and data manager functionality"
 fi

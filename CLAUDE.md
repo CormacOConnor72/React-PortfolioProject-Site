@@ -51,9 +51,15 @@ App.jsx (Router wrapper)
 
 ### Backend Architecture
 - **AWS API Gateway**: RESTful API at `https://n9x7n282md.execute-api.us-east-1.amazonaws.com/prod`
-- **DynamoDB**: NoSQL database with automatic timestamps
+- **AWS Lambda Functions**: Serverless compute layer in `eu-north-1` region
+  - **Entry Management**: `portfolio-create-entry`, `portfolio-delete-entry`, `portfolio-get-entries`
+  - **Spin Analytics**: `recordSpin`, `getSpinHistory`, `getGlobalMetrics`, `clearSpinHistory`
+- **DynamoDB**: NoSQL database with automatic timestamps in `eu-north-1`
+  - **SpinHistory**: Tracks wheel usage and analytics
+  - **portfolio-data-entries**: Stores DataManager entries with fields: name, type, who, why
 - **Service Layer**: `src/services/dataService.js` provides clean API abstraction
 - **CORS Configuration**: Properly configured for cross-origin requests
+- **Cross-Region Setup**: API Gateway (us-east-1) → Lambda Functions (eu-north-1) for CloudFront compatibility
 
 ### Component Patterns
 
@@ -240,10 +246,80 @@ portfolio-site/
 │       └── viewportManager.js  # Dynamic viewport management for in-app browsers
 ├── public/                     # Static assets
 ├── dist/                       # Build output (gitignored)
+├── lambda-functions/           # AWS Lambda functions for backend
+│   ├── recordSpin.js          # Analytics: Record wheel spins
+│   ├── getSpinHistory.js      # Analytics: Retrieve spin history
+│   ├── getGlobalMetrics.js    # Analytics: Global usage statistics
+│   ├── clearSpinHistory.js    # Analytics: Clear history data
+│   ├── portfolioCreateEntry.js # DataManager: Create entries
+│   ├── portfolioDeleteEntry.js # DataManager: Delete entries
+│   ├── portfolioGetEntries.js  # DataManager: Retrieve entries
+│   ├── package.json            # Lambda dependencies (AWS SDK v3)
+│   ├── deploy.sh              # Main deployment script
+│   ├── quick-deploy.sh        # Fast deployment script
+│   ├── verify-deployment.sh   # Post-deployment testing
+│   ├── README.md              # Lambda functions overview
+│   └── guides/                # Documentation
+│       ├── DEPLOYMENT_GUIDE.md
+│       ├── MANUAL_DEPLOYMENT_GUIDE.md
+│       ├── AWS_TROUBLESHOOTING_GUIDE.md
+│       └── README.md
 └── .github/
     └── workflows/
         └── deploy.yml          # CI/CD pipeline
 ```
+
+## Lambda Functions Deployment
+
+### Available Lambda Functions
+The backend consists of 8 Lambda functions deployed in the `eu-north-1` region:
+
+**Entry Management System:**
+- `portfolio-create-entry` - Creates new wheel entries
+- `portfolio-delete-entry` - Removes wheel entries
+- `portfolio-get-entries` - Retrieves all wheel entries
+
+**Spin Analytics System:**
+- `recordSpin` - Records wheel spin events
+- `getSpinHistory` - Retrieves paginated spin history
+- `getGlobalMetrics` - Calculates usage statistics and analytics
+- `clearSpinHistory` - Clears all spin data (admin function)
+
+### Deployment Commands
+
+**Quick Deployment:**
+```bash
+cd lambda-functions
+./deploy.sh deploy          # Deploy all functions automatically
+./verify-deployment.sh      # Comprehensive testing suite
+```
+
+**Alternative Methods:**
+```bash
+./deploy.sh                 # Package only (manual upload)
+./quick-deploy.sh           # Fast deployment for updates
+```
+
+### API Endpoints
+All endpoints are available at: `https://n9x7n282md.execute-api.us-east-1.amazonaws.com/prod`
+
+**Entry Management:**
+- `GET /entries` - List all entries
+- `POST /entries` - Create new entry
+- `DELETE /entries/{id}` - Delete specific entry
+
+**Spin Analytics:**
+- `POST /spins` - Record a wheel spin
+- `GET /spins?limit=N` - Get spin history
+- `GET /metrics` - Get usage analytics
+- `DELETE /spins` - Clear all spin data
+
+### Troubleshooting
+See `lambda-functions/guides/AWS_TROUBLESHOOTING_GUIDE.md` for:
+- Common issues and solutions
+- AWS CLI diagnostic commands
+- API Gateway configuration fixes
+- DynamoDB permission problems
 
 ## Important Implementation Notes
 - **JavaScript with JSX** - No TypeScript
