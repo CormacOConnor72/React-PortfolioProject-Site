@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import dataService from '../services/dataService';
+import GlobalMetrics from './GlobalMetrics';
 import '../styles/DataManager.css';
 
 const DataManager = () => {
@@ -337,6 +338,9 @@ const DataManager = () => {
             </div>
           </div>
         </div>
+
+        {/* Global Metrics */}
+        <GlobalMetrics variant="compact" />
 
         {error && (
           <div className="error-banner">

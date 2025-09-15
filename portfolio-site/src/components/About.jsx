@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import GlobalMetrics from './GlobalMetrics';
 import '../styles/About.css';
 
 const About = () => {
@@ -100,6 +101,9 @@ const About = () => {
                 <p>Devices Managed</p>
               </div>
             </div>
+
+            {/* Global Decision Metrics */}
+            <GlobalMetrics variant="compact" />
           </div>
 
           <div ref={skillsRef} className="about-skills">
