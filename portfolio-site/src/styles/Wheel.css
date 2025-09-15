@@ -95,6 +95,18 @@
   z-index: 1;
 }
 
+/* Global metrics styling */
+.wheel-metric-card.global-metric {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.1));
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.1);
+}
+
+.wheel-metric-card.global-metric:hover {
+  border-color: rgba(59, 130, 246, 0.5);
+  box-shadow: 0 8px 30px rgba(59, 130, 246, 0.2);
+}
+
 .most-spun {
   text-align: left;
 }
@@ -382,6 +394,57 @@
   font-size: 0.85rem;
 }
 
+/* Enhanced spin history styles */
+.spins-tabs {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.spins-toggle {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.8rem;
+}
+
+.spins-session {
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.3rem 0.6rem;
+  border-radius: 12px;
+}
+
+.spins-global {
+  color: rgba(59, 130, 246, 0.9);
+  background: rgba(59, 130, 246, 0.15);
+  padding: 0.3rem 0.6rem;
+  border-radius: 12px;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.spin-history-section {
+  margin-bottom: 1.5rem;
+}
+
+.spin-history-section h5 {
+  font-size: 0.9rem;
+  margin-bottom: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.spin-history-item.session {
+  border-left: 3px solid var(--primary-color);
+}
+
+.spin-history-item.global {
+  border-left: 3px solid rgba(59, 130, 246, 0.8);
+  background: rgba(59, 130, 246, 0.08);
+}
+
 .spin-entry {
   color: var(--text-secondary);
   font-weight: 500;
@@ -483,6 +546,7 @@
 }
 
 .wheel {
+  transform-origin: center center; /* Simple center rotation */
   transition: transform 3s cubic-bezier(0.23, 1, 0.32, 1);
   filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.2));
   cursor: pointer;
@@ -497,10 +561,10 @@
   filter: drop-shadow(0 15px 40px rgba(0, 0, 0, 0.3));
 }
 
-/* Wheel Pointer */
+/* Wheel Pointer - Fixed positioning to point exactly at top edge */
 .wheel-pointer {
   position: absolute;
-  top: -25px;
+  top: -20px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;

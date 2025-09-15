@@ -10,17 +10,21 @@ const Wheel = () => {
   const [isSpinning, setIsSpinning] = useState(false);
   const [selectedEntry, setSelectedEntry] = useState(null);
   const [spinHistory, setSpinHistory] = useState([]);
+  const [globalSpinHistory, setGlobalSpinHistory] = useState([]);
+  const [globalMetrics, setGlobalMetrics] = useState(null);
   const [rotation, setRotation] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showAdvancedControls, setShowAdvancedControls] = useState(false);
   const [weightedMode, setWeightedMode] = useState(false);
+  const [metricsLoading, setMetricsLoading] = useState(false);
   const wheelRef = useRef(null);
   const sectionRef = useRef(null);
 
   // Load data from AWS API on component mount and set up listener
   useEffect(() => {
     loadEntries();
+    loadGlobalMetrics();
 
     // Listen for custom events (when DataManager updates)
     const handleDataManagerUpdate = (event) => {
@@ -53,34 +57,31 @@ const Wheel = () => {
     }
   };
 
-  // Computed values for metrics and filtering
-  const metrics = useMemo(() => {
-    const total = entries.length;
-    const types = entries.reduce((acc, entry) => {
-      acc[entry.type] = (acc[entry.type] || 0) + 1;
-      return acc;
-    }, {});
-    
-    const today = new Date();
-    const recentSpins = spinHistory.filter(spin => {
-      const spinDate = new Date(spin.timestamp);
-      const hourAgo = new Date(today.getTime() - 60 * 60 * 1000);
-      return spinDate >= hourAgo;
-    }).length;
-    
-    const mostSpun = spinHistory.reduce((acc, spin) => {
-      const key = spin.entry.name;
-      acc[key] = (acc[key] || 0) + 1;
-      return acc;
-    }, {});
-    
-    const topSpun = Object.entries(mostSpun)
-      .sort(([,a], [,b]) => b - a)
-      .slice(0, 3)
-      .map(([name, count]) => ({ name, count }));
+  // Load global metrics and spin history
+  const loadGlobalMetrics = async () => {
+    try {
+      setMetricsLoading(true);
+      console.log('Wheel: Loading global metrics...');
 
-    return { total, types, recentSpins, topSpun, totalSpins: spinHistory.length };
-  }, [entries, spinHistory]);
+      // Load both metrics and recent spin history
+      const [metrics, history] = await Promise.all([
+        dataService.getGlobalMetrics(),
+        dataService.getSpinHistory(20) // Get last 20 spins for display
+      ]);
+
+      setGlobalMetrics(metrics);
+      setGlobalSpinHistory(history);
+      console.log('Wheel: Loaded global metrics:', metrics);
+      console.log('Wheel: Loaded global spin history:', history);
+    } catch (error) {
+      console.error('Wheel: Failed to load global metrics:', error);
+      // Don't show error to user, just log it
+    } finally {
+      setMetricsLoading(false);
+    }
+  };
+
+  // Computed values for filtering
 
   const uniqueTypes = useMemo(() => {
     return [...new Set(entries.map(entry => entry.type))].sort();
@@ -151,8 +152,8 @@ const Wheel = () => {
     }, 3000);
   };
 
-  // Enhanced spin wheel with history tracking
-  const spinWheel = () => {
+  // Enhanced spin wheel with global history tracking
+  const spinWheel = async () => {
     if (filteredEntries.length === 0) {
       showErrorMessage('No entries available! Please add some entries in the Data Manager first.');
       return;
@@ -167,19 +168,29 @@ const Wheel = () => {
     const randomSpins = 5 + Math.random() * 5; // 5-10 full rotations
     const randomDegree = Math.random() * 360;
     const totalRotation = rotation + (randomSpins * 360) + randomDegree;
-    
+
     setRotation(totalRotation);
 
     // Calculate which entry was selected based on final position
-    setTimeout(() => {
+    setTimeout(async () => {
       const normalizedDegree = totalRotation % 360;
       const segmentSize = 360 / filteredEntries.length;
-      // Adjust for pointer at top (12 o'clock) - add 90 degrees to align properly
-      const adjustedDegree = (normalizedDegree + 90) % 360;
-      const selectedIndex = Math.floor(adjustedDegree / segmentSize) % filteredEntries.length;
+
+      // New simplified calculation:
+      // - Pointer is at 0 degrees (top)
+      // - Segments start at 0 degrees and go clockwise
+      // - When wheel rotates clockwise, we reverse the rotation to find which segment is under pointer
+
+      const targetAngle = (360 - normalizedDegree) % 360;
+      const selectedIndex = Math.floor(targetAngle / segmentSize) % filteredEntries.length;
+
+      // Debug logging (remove in production)
+      console.log('=== WHEEL DEBUG ===');
+      console.log('Rotation:', normalizedDegree, '| Target angle:', targetAngle, '| Selected:', filteredEntries[selectedIndex]?.name);
+
       const winner = filteredEntries[selectedIndex];
-      
-      // Add to spin history
+
+      // Create spin record for local history
       const spinRecord = {
         id: Date.now(),
         entry: winner,
@@ -187,11 +198,34 @@ const Wheel = () => {
         filterUsed: activeFilter,
         totalOptions: filteredEntries.length
       };
-      
+
+      // Add to local spin history (session-based)
       setSpinHistory(prev => [spinRecord, ...prev.slice(0, 49)]); // Keep last 50 spins
+
+      // Save to global backend
+      try {
+        const globalSpinData = {
+          entryId: winner.id,
+          entryName: winner.name,
+          entryType: winner.type,
+          entryWho: winner.who,
+          filter: activeFilter,
+          weightedMode: weightedMode
+        };
+
+        await dataService.recordSpin(globalSpinData);
+        console.log('Wheel: Spin recorded to backend');
+
+        // Refresh global metrics after recording spin
+        loadGlobalMetrics();
+      } catch (error) {
+        console.error('Wheel: Failed to record spin to backend:', error);
+        // Don't show error to user, local spin still works
+      }
+
       setSelectedEntry(winner);
       setIsSpinning(false);
-      
+
       showSuccessMessage(`🎯 Selected: ${winner.name}`);
     }, 3000); // Match CSS animation duration
   };
@@ -242,11 +276,11 @@ const Wheel = () => {
     ];
 
     return filteredEntries.map((entry, index) => {
-      // Adjust starting angle to align with pointer at top (subtract 90 degrees)
-      const startAngle = (index * segmentAngle) - 90;
+      // Start at 0 degrees (top) and go clockwise
+      const startAngle = index * segmentAngle;
       const endAngle = startAngle + segmentAngle;
       const color = colors[index % colors.length];
-      
+
       return {
         ...entry,
         startAngle,
@@ -274,34 +308,48 @@ const Wheel = () => {
           </p>
         </div>
 
-        {/* Metrics Dashboard */}
+        {/* Global Metrics Dashboard */}
         <div className="wheel-metrics-dashboard">
           <div className="wheel-metric-card">
-            <div className="metric-value">{metrics.total}</div>
+            <div className="metric-value">{entries.length}</div>
             <div className="metric-label">Total Entries</div>
           </div>
+          <div className="wheel-metric-card global-metric">
+            <div className="metric-value">
+              {metricsLoading ? '...' : (globalMetrics?.totalSpins || 0)}
+            </div>
+            <div className="metric-label">🌍 Global Spins</div>
+          </div>
           <div className="wheel-metric-card">
-            <div className="metric-value">{metrics.totalSpins}</div>
-            <div className="metric-label">Total Spins</div>
+            <div className="metric-value">{spinHistory.length}</div>
+            <div className="metric-label">Session Spins</div>
           </div>
           <div className="wheel-metric-card">
             <div className="metric-value">{filteredEntries.length}</div>
             <div className="metric-label">Current Pool</div>
           </div>
-          <div className="wheel-metric-card most-spun">
-            <div className="metric-label">Most Spun</div>
+          <div className="wheel-metric-card most-spun global-metric">
+            <div className="metric-label">🏆 Most Spun Globally</div>
             <div className="most-spun-list">
-              {metrics.topSpun.length > 0 ? metrics.topSpun.slice(0, 2).map((item, idx) => (
+              {metricsLoading ? (
+                <div className="most-spun-item">Loading...</div>
+              ) : globalMetrics?.topEntries?.length > 0 ? globalMetrics.topEntries.slice(0, 2).map((item, idx) => (
                 <div key={idx} className="most-spun-item">
                   <span className="spun-name">{item.name.slice(0, 12)}{item.name.length > 12 ? '...' : ''}</span>
                   <span className="spun-count">{item.count}</span>
                 </div>
               )) : (
                 <div className="most-spun-item">
-                  <span className="spun-name">No spins yet</span>
+                  <span className="spun-name">No global spins yet</span>
                 </div>
               )}
             </div>
+          </div>
+          <div className="wheel-metric-card global-metric">
+            <div className="metric-value">
+              {metricsLoading ? '...' : (globalMetrics?.uniqueUsers || 0)}
+            </div>
+            <div className="metric-label">👥 Active Users</div>
           </div>
         </div>
 
@@ -381,17 +429,47 @@ const Wheel = () => {
                   </label>
                 </div>
                 
-                {spinHistory.length > 0 && (
+                {(spinHistory.length > 0 || globalSpinHistory.length > 0) && (
                   <div className="recent-spins">
-                    <h4>Recent Spins ({spinHistory.slice(0, 5).length})</h4>
-                    <div className="spin-history-list">
-                      {spinHistory.slice(0, 5).map((spin) => (
-                        <div key={spin.id} className="spin-history-item">
-                          <span className="spin-entry">{spin.entry.name}</span>
-                          <span className="spin-time">{new Date(spin.timestamp).toLocaleTimeString()}</span>
-                        </div>
-                      ))}
+                    <div className="spins-tabs">
+                      <h4>Recent Spins</h4>
+                      <div className="spins-toggle">
+                        <span className="spins-session">Session: {spinHistory.length}</span>
+                        <span className="spins-global">Global: {globalSpinHistory.length}</span>
+                      </div>
                     </div>
+
+                    {/* Session Spins */}
+                    {spinHistory.length > 0 && (
+                      <div className="spin-history-section">
+                        <h5>🎯 Your Session</h5>
+                        <div className="spin-history-list">
+                          {spinHistory.slice(0, 3).map((spin) => (
+                            <div key={spin.id} className="spin-history-item session">
+                              <span className="spin-entry">{spin.entry.name}</span>
+                              <span className="spin-time">{new Date(spin.timestamp).toLocaleTimeString()}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Global Spins */}
+                    {globalSpinHistory.length > 0 && (
+                      <div className="spin-history-section">
+                        <h5>🌍 Global Activity</h5>
+                        <div className="spin-history-list">
+                          {globalSpinHistory.slice(0, 4).map((spin, idx) => (
+                            <div key={spin.id || idx} className="spin-history-item global">
+                              <span className="spin-entry">{spin.entryName}</span>
+                              <span className="spin-time">
+                                {new Date(spin.timestamp).toLocaleDateString()} {new Date(spin.timestamp).toLocaleTimeString()}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -456,9 +534,10 @@ const Wheel = () => {
                       const centerY = 200;
                       const radius = 180;
                       
-                      // Convert angles to radians
-                      const startRad = (startAngle * Math.PI) / 180;
-                      const endRad = (endAngle * Math.PI) / 180;
+                      // Convert angles to radians, adjusting for SVG coordinate system
+                      // SVG 0° is at 3 o'clock, we want 0° at 12 o'clock, so subtract 90°
+                      const startRad = ((startAngle - 90) * Math.PI) / 180;
+                      const endRad = ((endAngle - 90) * Math.PI) / 180;
                       
                       // Calculate path coordinates
                       const x1 = centerX + radius * Math.cos(startRad);
@@ -477,7 +556,7 @@ const Wheel = () => {
                       
                       // Calculate text position
                       const textAngle = (startAngle + endAngle) / 2;
-                      const textRad = (textAngle * Math.PI) / 180;
+                      const textRad = ((textAngle - 90) * Math.PI) / 180;
                       const textRadius = radius * 0.7;
                       const textX = centerX + textRadius * Math.cos(textRad);
                       const textY = centerY + textRadius * Math.sin(textRad);
