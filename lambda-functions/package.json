@@ -1,0 +1,19 @@
+{
+  "name": "portfolio-lambda-functions",
+  "version": "1.0.0",
+  "description": "AWS Lambda functions for portfolio site spin tracking and metrics",
+  "main": "index.js",
+  "scripts": {
+    "deploy": "echo 'Deploy individual functions to AWS Lambda'",
+    "test": "echo 'No tests defined yet'"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.478.0",
+    "@aws-sdk/lib-dynamodb": "^3.478.0",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {},
+  "keywords": ["aws", "lambda", "dynamodb", "portfolio"],
+  "author": "Cormac O'Connor",
+  "license": "MIT"
+}
