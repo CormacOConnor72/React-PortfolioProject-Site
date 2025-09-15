@@ -25,7 +25,7 @@ const GlobalMetrics = ({ variant = 'compact' }) => {
     }
   };
 
-  if (error || !metrics) {
+  if (error || (!isLoading && !metrics)) {
     return null; // Fail silently to not break the page
   }
 

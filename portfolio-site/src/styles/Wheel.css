@@ -540,12 +540,15 @@
 
 .wheel-wrapper {
   position: relative;
+  width: 400px;
+  height: 400px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .wheel {
+  transform-origin: 200px 200px; /* Explicit center point for rotation */
   transition: transform 3s cubic-bezier(0.23, 1, 0.32, 1);
   filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.2));
   cursor: pointer;
@@ -560,12 +563,12 @@
   filter: drop-shadow(0 15px 40px rgba(0, 0, 0, 0.3));
 }
 
-/* Wheel Pointer */
+/* Wheel Pointer - Fixed positioning to point exactly at top edge */
 .wheel-pointer {
   position: absolute;
-  top: -25px;
+  top: 0;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) translateY(-20px);
   z-index: 10;
   filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
   pointer-events: none;

@@ -81,34 +81,7 @@ const Wheel = () => {
     }
   };
 
-  // Computed values for metrics and filtering
-  const metrics = useMemo(() => {
-    const total = entries.length;
-    const types = entries.reduce((acc, entry) => {
-      acc[entry.type] = (acc[entry.type] || 0) + 1;
-      return acc;
-    }, {});
-    
-    const today = new Date();
-    const recentSpins = spinHistory.filter(spin => {
-      const spinDate = new Date(spin.timestamp);
-      const hourAgo = new Date(today.getTime() - 60 * 60 * 1000);
-      return spinDate >= hourAgo;
-    }).length;
-    
-    const mostSpun = spinHistory.reduce((acc, spin) => {
-      const key = spin.entry.name;
-      acc[key] = (acc[key] || 0) + 1;
-      return acc;
-    }, {});
-    
-    const topSpun = Object.entries(mostSpun)
-      .sort(([,a], [,b]) => b - a)
-      .slice(0, 3)
-      .map(([name, count]) => ({ name, count }));
-
-    return { total, types, recentSpins, topSpun, totalSpins: spinHistory.length };
-  }, [entries, spinHistory]);
+  // Computed values for filtering
 
   const uniqueTypes = useMemo(() => {
     return [...new Set(entries.map(entry => entry.type))].sort();
@@ -202,9 +175,19 @@ const Wheel = () => {
     setTimeout(async () => {
       const normalizedDegree = totalRotation % 360;
       const segmentSize = 360 / filteredEntries.length;
-      // Adjust for pointer at top (12 o'clock) - add 90 degrees to align properly
-      const adjustedDegree = (normalizedDegree + 90) % 360;
-      const selectedIndex = Math.floor(adjustedDegree / segmentSize) % filteredEntries.length;
+
+      // New simplified calculation:
+      // - Pointer is at 0 degrees (top)
+      // - Segments start at 0 degrees and go clockwise
+      // - When wheel rotates clockwise, we reverse the rotation to find which segment is under pointer
+
+      const targetAngle = (360 - normalizedDegree) % 360;
+      const selectedIndex = Math.floor(targetAngle / segmentSize) % filteredEntries.length;
+
+      // Debug logging (remove in production)
+      console.log('=== WHEEL DEBUG ===');
+      console.log('Rotation:', normalizedDegree, '| Target angle:', targetAngle, '| Selected:', filteredEntries[selectedIndex]?.name);
+
       const winner = filteredEntries[selectedIndex];
 
       // Create spin record for local history
@@ -293,11 +276,11 @@ const Wheel = () => {
     ];
 
     return filteredEntries.map((entry, index) => {
-      // Adjust starting angle to align with pointer at top (subtract 90 degrees)
-      const startAngle = (index * segmentAngle) - 90;
+      // Start at 0 degrees (top) and go clockwise
+      const startAngle = index * segmentAngle;
       const endAngle = startAngle + segmentAngle;
       const color = colors[index % colors.length];
-      
+
       return {
         ...entry,
         startAngle,
@@ -551,9 +534,10 @@ const Wheel = () => {
                       const centerY = 200;
                       const radius = 180;
                       
-                      // Convert angles to radians
-                      const startRad = (startAngle * Math.PI) / 180;
-                      const endRad = (endAngle * Math.PI) / 180;
+                      // Convert angles to radians, adjusting for SVG coordinate system
+                      // SVG 0° is at 3 o'clock, we want 0° at 12 o'clock, so subtract 90°
+                      const startRad = ((startAngle - 90) * Math.PI) / 180;
+                      const endRad = ((endAngle - 90) * Math.PI) / 180;
                       
                       // Calculate path coordinates
                       const x1 = centerX + radius * Math.cos(startRad);
@@ -572,7 +556,7 @@ const Wheel = () => {
                       
                       // Calculate text position
                       const textAngle = (startAngle + endAngle) / 2;
-                      const textRad = (textAngle * Math.PI) / 180;
+                      const textRad = ((textAngle - 90) * Math.PI) / 180;
                       const textRadius = radius * 0.7;
                       const textX = centerX + textRadius * Math.cos(textRad);
                       const textY = centerY + textRadius * Math.sin(textRad);
