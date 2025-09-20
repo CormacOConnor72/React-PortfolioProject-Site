@@ -321,6 +321,62 @@ See `lambda-functions/guides/AWS_TROUBLESHOOTING_GUIDE.md` for:
 - API Gateway configuration fixes
 - DynamoDB permission problems
 
+### Lambda Functions Architecture & Deployment
+
+**Function Structure:**
+All Lambda functions are individual `.js` files with unified dependencies managed via a single `package.json`:
+- **Dependencies**: `@aws-sdk/client-dynamodb`, `@aws-sdk/lib-dynamodb`, `uuid`
+- **Runtime**: Node.js 20.x
+- **Packaging**: Each function zipped individually with shared dependencies
+- **Deployment**: Automated via `deploy.sh` with backup system
+
+**Deployment Scripts:**
+- `deploy.sh` - Main deployment script with packaging and AWS deployment
+- `quick-deploy.sh` - Fast deployment for code updates only
+- `verify-deployment.sh` - Comprehensive testing suite for all functions and endpoints
+- `package-functions.sh` - Creates ZIP packages for manual deployment
+
+**Backup System:**
+- Automatic backups created before each deployment in `backups/YYYYMMDD_HHMMSS/`
+- Backup URLs stored for rollback capability
+- Each function versioned independently
+
+### Critical Cross-Region Configuration Notes
+The infrastructure uses a **cross-region setup** that requires specific configuration:
+
+**Architecture:**
+- **API Gateway**: `us-east-1` (required for CloudFront compatibility)
+- **Lambda Functions**: `eu-north-1`
+- **DynamoDB**: `eu-north-1`
+
+**Lambda Permission Requirements:**
+For cross-region API Gateway → Lambda integration to work, Lambda permissions must use the **Lambda function's region** (`eu-north-1`) in the source ARN, NOT the API Gateway region:
+
+```bash
+# CORRECT - Uses eu-north-1 (Lambda region)
+arn:aws:execute-api:eu-north-1:ACCOUNT:API_ID/*/METHOD/path/*
+
+# INCORRECT - Uses us-east-1 (API Gateway region)
+arn:aws:execute-api:us-east-1:ACCOUNT:API_ID/*/METHOD/path/*
+```
+
+**API Gateway Integration Requirements:**
+All methods must have both:
+1. **Method Responses**: Defined response codes (200, etc.)
+2. **Integration Responses**: Maps Lambda response to method response with CORS headers
+
+Missing `integrationResponses` will cause "Internal server error" even if Lambda executes successfully.
+
+**Path Parameter Configuration:**
+Resource paths must use `{parameter}` syntax (not literal values):
+- ✅ `/entries/{id}` - Creates path parameter
+- ❌ `/entries/id` - Literal string, no parameter extraction
+
+**Function Naming Convention:**
+- Portfolio data functions: `portfolio-[action]-entry` (e.g., `portfolio-delete-entry`)
+- Analytics functions: `[action][Entity]` (e.g., `recordSpin`, `getGlobalMetrics`)
+- All functions deployable via unified scripts despite naming differences
+
 ## Important Implementation Notes
 - **JavaScript with JSX** - No TypeScript
 - **Comprehensive Testing** - Full test suite with Vitest and Testing Library

@@ -61,6 +61,25 @@ discover_lambda_names() {
     done
 }
 
+# Function to map local function names to AWS function names
+get_aws_function_name() {
+    local local_name=$1
+    case $local_name in
+        "portfolioCreateEntry")
+            echo "portfolio-create-entry"
+            ;;
+        "portfolioDeleteEntry")
+            echo "portfolio-delete-entry"
+            ;;
+        "portfolioGetEntries")
+            echo "portfolio-get-entries"
+            ;;
+        *)
+            echo "$local_name"
+            ;;
+    esac
+}
+
 # Function to create backup of existing Lambda function
 backup_function() {
     local aws_function_name=$1
@@ -78,12 +97,14 @@ backup_function() {
 
 # Function to test Lambda function after deployment
 test_function() {
-    local function_name=$1
-    log_info "Testing $function_name..."
+    local local_function_name=$1
+    local aws_function_name=$(get_aws_function_name "$local_function_name")
 
-    # Create a test event based on function type
-    local test_event=""
-    case $function_name in
+    log_info "Testing $local_function_name (AWS: $aws_function_name)..."
+
+    # Create a test payload based on function type
+    local test_payload=""
+    case $local_function_name in
         *"recordSpin"*)
             test_payload='{"body": "{\"entryId\":\"test\",\"entryName\":\"Test Entry\",\"sessionId\":\"test_session\"}"}'
             ;;
@@ -98,26 +119,65 @@ test_function() {
             return 0
             ;;
         *"portfolioCreateEntry"*)
-            test_payload='{"body": "{\"name\":\"Test Entry\",\"type\":\"Test\",\"who\":\"Test User\",\"why\":\"Testing deployment\"}"}'
+            test_payload='{"body": "{\"name\":\"[DEPLOY_TEST] Test Entry\",\"type\":\"Test\",\"who\":\"Deploy Script\",\"why\":\"Testing deployment - will be cleaned up\"}"}'
             ;;
         *"portfolioDeleteEntry"*)
-            test_payload='{"pathParameters": {"id": "test-id-for-testing"}}'
+            log_warning "Skipping test for portfolioDeleteEntry (requires existing entry ID)"
+            return 0
             ;;
         *"portfolioGetEntries"*)
             test_payload='{}'
             ;;
     esac
 
-    if aws lambda invoke --function-name "$function_name" --payload "$test_payload" --cli-binary-format raw-in-base64-out /tmp/lambda_test_output.json --region eu-north-1 >/dev/null 2>&1; then
+    if aws lambda invoke --function-name "$aws_function_name" --payload "$test_payload" --cli-binary-format raw-in-base64-out /tmp/lambda_test_output.json --region eu-north-1 >/dev/null 2>&1; then
         if grep -q '"statusCode": 200' /tmp/lambda_test_output.json 2>/dev/null || grep -q '"statusCode": 201' /tmp/lambda_test_output.json 2>/dev/null; then
-            log_success "Test passed for $function_name"
+            log_success "Test passed for $aws_function_name"
+
+            # For portfolio create entry, verify the entry actually exists in database
+            if [[ "$local_function_name" == *"portfolioCreateEntry"* ]]; then
+                log_info "Verifying test entry exists in database..."
+                for attempt in 1 2 3 4 5; do
+                    if curl -s "https://n9x7n282md.execute-api.us-east-1.amazonaws.com/prod/entries" | grep -q "\\[DEPLOY_TEST\\]"; then
+                        log_success "Test entry confirmed in database"
+                        break
+                    elif [ $attempt -eq 5 ]; then
+                        log_warning "Test entry not found in database after 5 attempts"
+                    else
+                        sleep 1
+                    fi
+                done
+            fi
         else
-            log_warning "Test completed but may have issues. Check CloudWatch logs for $function_name"
+            log_warning "Test completed but may have issues. Check CloudWatch logs for $aws_function_name"
         fi
     else
-        log_error "Test failed for $function_name"
+        log_error "Test failed for $aws_function_name"
     fi
     rm -f /tmp/lambda_test_output.json
+}
+
+# Function to clean up test entries
+cleanup_test_entries() {
+    log_info "Cleaning up test entries..."
+
+    # Clean up portfolio test entries
+    API_BASE_URL="https://n9x7n282md.execute-api.us-east-1.amazonaws.com/prod"
+
+    # Get all entries and filter for test entries
+    TEST_ENTRIES=$(curl -s "$API_BASE_URL/entries" | grep -o '"id":"[^"]*"[^}]*"name":"[^"]*\[DEPLOY_TEST\]' | grep -o '"id":"[^"]*"' | cut -d'"' -f4)
+
+    if [ ! -z "$TEST_ENTRIES" ]; then
+        echo "$TEST_ENTRIES" | while read -r entry_id; do
+            if [ ! -z "$entry_id" ]; then
+                log_info "Removing test entry: $entry_id"
+                curl -s -X DELETE "$API_BASE_URL/entries/$entry_id" > /dev/null
+            fi
+        done
+        log_success "Test entries cleaned up"
+    else
+        log_info "No test entries found to clean up"
+    fi
 }
 
 # Clean up old packages and artifacts
@@ -248,8 +308,9 @@ if [ "$DEPLOY_TO_AWS" = "deploy" ]; then
         echo ""
         log_info "Deploying $FUNCTION_NAME..."
 
-        # Try exact name first
-        AWS_FUNCTION_NAME="$FUNCTION_NAME"
+        # Get the correct AWS function name
+        AWS_FUNCTION_NAME=$(get_aws_function_name "$FUNCTION_NAME")
+        log_info "Local: $FUNCTION_NAME → AWS: $AWS_FUNCTION_NAME"
 
         # Create backup
         backup_function "$AWS_FUNCTION_NAME" "$FUNCTION_NAME"
@@ -278,6 +339,9 @@ if [ "$DEPLOY_TO_AWS" = "deploy" ]; then
             aws lambda list-functions --query 'Functions[*].[FunctionName,Runtime]' --output table
         fi
     done
+
+    # Clean up test entries created during deployment testing
+    cleanup_test_entries
 
     log_success "🎉 Deployment process completed!"
     echo ""
