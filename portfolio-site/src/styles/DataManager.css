@@ -202,23 +202,27 @@
   .data-manager-content {
     padding: 0 0.25rem;
   }
-  
+
   .data-grid-container {
     margin: 0 -0.25rem;
-    min-width: 450px;
+    width: calc(100% + 0.5rem);
+    max-width: calc(100vw - 0.5rem);
+    min-width: 300px;
   }
-  
+
   .data-grid-header,
   .data-grid-row {
-    padding: 0.4rem;
-    font-size: 0.7rem;
-    grid-template-columns: 
-      minmax(60px, 0.8fr)   /* Name */
-      minmax(45px, 0.4fr)   /* Type */
-      minmax(55px, 0.5fr)   /* Who */
-      minmax(80px, 1fr)     /* Why */
-      minmax(55px, 0.4fr)   /* Date */
-      minmax(30px, 0.2fr);  /* Actions */
+    padding: clamp(0.25rem, 1vw, 0.4rem);
+    font-size: clamp(0.6rem, 1.5vw, 0.7rem);
+    grid-template-columns:
+      minmax(calc(var(--dynamic-min-width, 50px) * 0.5), 0.8fr)   /* Name */
+      minmax(calc(var(--dynamic-min-width, 35px) * 0.35), 0.4fr)  /* Type */
+      minmax(calc(var(--dynamic-min-width, 45px) * 0.45), 0.5fr)  /* Who */
+      minmax(calc(var(--dynamic-min-width, 60px) * 0.6), 1fr)     /* Why */
+      minmax(calc(var(--dynamic-min-width, 45px) * 0.35), 0.4fr)  /* Date */
+      minmax(25px, 0.2fr);  /* Actions */
+    width: 100%;
+    max-width: 100%;
   }
   
   .metrics-dashboard {
@@ -363,6 +367,10 @@
   opacity: 0;
   transform: translateY(30px);
   animation: fadeInUp 0.8s ease-out 0.4s forwards;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .data-header {
@@ -639,12 +647,16 @@
   overflow: hidden;
   position: relative;
   width: 100%;
+  max-width: 100%;
   box-sizing: border-box;
   /* Pre-size container to prevent layout shift */
   min-height: 200px;
-  /* Ensure mobile scroll works properly */
+  /* Improved responsive overflow handling */
   overflow-x: auto;
+  overflow-y: visible;
   -webkit-overflow-scrolling: touch;
+  /* Container queries support */
+  container-type: inline-size;
 }
 
 .data-grid-container::before {
@@ -700,18 +712,19 @@
 .data-grid-header,
 .data-grid-row {
   display: grid;
-  grid-template-columns: 
-    minmax(max(var(--dynamic-min-width, 120px), 120px), 1.2fr)  /* Name */
-    minmax(max(var(--dynamic-min-width, 80px), 80px), 0.8fr)   /* Type */
-    minmax(max(var(--dynamic-min-width, 100px), 100px), 1fr)    /* Who */
-    minmax(max(var(--dynamic-min-width, 150px), 150px), 1.8fr)  /* Why */
-    minmax(max(var(--dynamic-min-width, 100px), 100px), 0.8fr)  /* Date */
-    minmax(60px, 0.4fr);  /* Actions */
-  gap: 1rem;
+  grid-template-columns:
+    minmax(calc(var(--dynamic-min-width, 100px) * 0.8), 1.2fr)  /* Name */
+    minmax(calc(var(--dynamic-min-width, 60px) * 0.6), 0.8fr)   /* Type */
+    minmax(calc(var(--dynamic-min-width, 80px) * 0.7), 1fr)     /* Who */
+    minmax(calc(var(--dynamic-min-width, 120px) * 0.9), 1.8fr)  /* Why */
+    minmax(calc(var(--dynamic-min-width, 80px) * 0.6), 0.8fr)   /* Date */
+    minmax(50px, 0.4fr);  /* Actions */
+  gap: clamp(0.25rem, 2vw, 1rem);
   align-items: center;
   position: relative;
   z-index: 1;
-  min-width: fit-content;
+  width: 100%;
+  max-width: 100%;
 }
 
 .data-grid-header {
@@ -952,21 +965,24 @@
     border-right: none;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    width: calc(100% + 2rem);
+    max-width: calc(100vw);
   }
   
   .data-grid-header,
   .data-grid-row {
-    grid-template-columns: 
-      minmax(90px, 1fr)     /* Name */
-      minmax(60px, 0.6fr)   /* Type */
-      minmax(70px, 0.7fr)   /* Who */
-      minmax(110px, 1.3fr)  /* Why */
-      minmax(70px, 0.6fr)   /* Date */
-      minmax(40px, 0.3fr);  /* Actions */
-    gap: 0.5rem;
-    padding: 0.75rem;
-    font-size: 0.85rem;
-    min-width: 500px;
+    grid-template-columns:
+      minmax(calc(var(--dynamic-min-width, 80px) * 0.7), 1fr)     /* Name */
+      minmax(calc(var(--dynamic-min-width, 50px) * 0.5), 0.6fr)   /* Type */
+      minmax(calc(var(--dynamic-min-width, 60px) * 0.6), 0.7fr)   /* Who */
+      minmax(calc(var(--dynamic-min-width, 90px) * 0.8), 1.3fr)   /* Why */
+      minmax(calc(var(--dynamic-min-width, 60px) * 0.5), 0.6fr)   /* Date */
+      minmax(35px, 0.3fr);  /* Actions */
+    gap: clamp(0.25rem, 1.5vw, 0.5rem);
+    padding: clamp(0.5rem, 2vw, 0.75rem);
+    font-size: clamp(0.75rem, 2.5vw, 0.85rem);
+    width: 100%;
+    max-width: 100%;
   }
   
   .grid-cell {
@@ -1059,21 +1075,25 @@
   
   .data-grid-container {
     margin: 0 -0.5rem;
-    min-width: 480px;
+    width: calc(100% + 1rem);
+    max-width: calc(100vw - 1rem);
+    min-width: 320px;
   }
   
   .data-grid-header,
   .data-grid-row {
-    grid-template-columns: 
-      minmax(70px, 0.9fr)   /* Name */
-      minmax(50px, 0.5fr)   /* Type */
-      minmax(60px, 0.6fr)   /* Who */
-      minmax(90px, 1.2fr)   /* Why */
-      minmax(60px, 0.5fr)   /* Date */
-      minmax(35px, 0.25fr); /* Actions */
-    gap: 0.25rem;
-    padding: 0.5rem;
-    font-size: 0.75rem;
+    grid-template-columns:
+      minmax(calc(var(--dynamic-min-width, 60px) * 0.6), 0.9fr)   /* Name */
+      minmax(calc(var(--dynamic-min-width, 40px) * 0.4), 0.5fr)   /* Type */
+      minmax(calc(var(--dynamic-min-width, 50px) * 0.5), 0.6fr)   /* Who */
+      minmax(calc(var(--dynamic-min-width, 70px) * 0.7), 1.2fr)   /* Why */
+      minmax(calc(var(--dynamic-min-width, 50px) * 0.4), 0.5fr)   /* Date */
+      minmax(30px, 0.25fr); /* Actions */
+    gap: clamp(0.125rem, 1vw, 0.25rem);
+    padding: clamp(0.25rem, 1.5vw, 0.5rem);
+    font-size: clamp(0.65rem, 2vw, 0.75rem);
+    width: 100%;
+    max-width: 100%;
   }
   
   .grid-cell {
