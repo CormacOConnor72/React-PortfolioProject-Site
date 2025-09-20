@@ -17,12 +17,10 @@
 .data-manager-content {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 4rem;
+  gap: 3rem;
   margin-top: 3rem;
   position: relative;
   z-index: 1;
-  /* Enhanced centering */
-  justify-items: center;
   width: 100%;
   max-width: 100vw;
   overflow-x: hidden;
@@ -150,10 +148,9 @@
 
 @media (min-width: 1200px) {
   .data-manager-content {
-    grid-template-columns: 400px 1fr;
-    gap: 6rem;
-    align-items: start;
-    /* Reset centering for desktop layout */
+    grid-template-columns: 1fr;
+    gap: 4rem;
+    align-items: stretch;
     justify-items: stretch;
   }
   
@@ -169,8 +166,8 @@
 
 @media (min-width: 1600px) {
   .data-manager-content {
-    grid-template-columns: 450px 1fr;
-    gap: 8rem;
+    grid-template-columns: 1fr;
+    gap: 4rem;
   }
   
   .metrics-dashboard {
@@ -184,8 +181,8 @@
 
 @media (min-width: 2000px) {
   .data-manager-content {
-    grid-template-columns: 500px 1fr;
-    gap: 10rem;
+    grid-template-columns: 1fr;
+    gap: 4rem;
   }
   
   .metrics-dashboard {
@@ -215,14 +212,12 @@
     padding: clamp(0.25rem, 1vw, 0.4rem);
     font-size: clamp(0.6rem, 1.5vw, 0.7rem);
     grid-template-columns:
-      minmax(calc(var(--dynamic-min-width, 50px) * 0.5), 0.8fr)   /* Name */
-      minmax(calc(var(--dynamic-min-width, 35px) * 0.35), 0.4fr)  /* Type */
-      minmax(calc(var(--dynamic-min-width, 45px) * 0.45), 0.5fr)  /* Who */
-      minmax(calc(var(--dynamic-min-width, 60px) * 0.6), 1fr)     /* Why */
-      minmax(calc(var(--dynamic-min-width, 45px) * 0.35), 0.4fr)  /* Date */
-      minmax(25px, 0.2fr);  /* Actions */
-    width: 100%;
-    max-width: 100%;
+      0.8fr    /* Name */
+      0.5fr    /* Type */
+      0.6fr    /* Who */
+      1.2fr    /* Why */
+      0.5fr    /* Date */
+      0.25fr;  /* Actions */
   }
   
   .metrics-dashboard {
@@ -266,7 +261,8 @@
   animation: fadeInUp 0.8s ease-out 0.2s forwards;
   box-shadow: var(--shadow);
   width: 100%;
-  max-width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
   box-sizing: border-box;
 }
 
@@ -651,12 +647,9 @@
   box-sizing: border-box;
   /* Pre-size container to prevent layout shift */
   min-height: 200px;
-  /* Improved responsive overflow handling */
-  overflow-x: auto;
+  /* No horizontal scrolling - table must fit */
+  overflow-x: hidden;
   overflow-y: visible;
-  -webkit-overflow-scrolling: touch;
-  /* Container queries support */
-  container-type: inline-size;
 }
 
 .data-grid-container::before {
@@ -713,18 +706,19 @@
 .data-grid-row {
   display: grid;
   grid-template-columns:
-    minmax(calc(var(--dynamic-min-width, 100px) * 0.8), 1.2fr)  /* Name */
-    minmax(calc(var(--dynamic-min-width, 60px) * 0.6), 0.8fr)   /* Type */
-    minmax(calc(var(--dynamic-min-width, 80px) * 0.7), 1fr)     /* Who */
-    minmax(calc(var(--dynamic-min-width, 120px) * 0.9), 1.8fr)  /* Why */
-    minmax(calc(var(--dynamic-min-width, 80px) * 0.6), 0.8fr)   /* Date */
-    minmax(50px, 0.4fr);  /* Actions */
-  gap: clamp(0.25rem, 2vw, 1rem);
+    1.2fr  /* Name */
+    0.8fr  /* Type */
+    1fr    /* Who */
+    2fr    /* Why */
+    0.9fr  /* Date */
+    0.4fr; /* Actions */
+  gap: clamp(0.25rem, 1vw, 0.75rem);
   align-items: center;
   position: relative;
   z-index: 1;
   width: 100%;
-  max-width: 100%;
+  padding: clamp(0.5rem, 1.5vw, 1rem);
+  box-sizing: border-box;
 }
 
 .data-grid-header {
@@ -732,8 +726,7 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   font-weight: 600;
   color: var(--text-primary);
-  font-size: 0.95rem;
-  padding: 1rem;
+  font-size: clamp(0.8rem, 2vw, 0.95rem);
   position: sticky;
   top: 0;
   z-index: 2;
@@ -758,12 +751,12 @@
 }
 
 .data-grid-row {
-  padding: 1rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   transition: all 0.3s ease;
   opacity: 0;
   transform: translateY(20px);
   animation: fadeInUp 0.5s ease-out forwards;
+  font-size: clamp(0.75rem, 1.8vw, 0.9rem);
 }
 
 .data-grid-row:hover {
@@ -782,6 +775,10 @@
   word-wrap: break-word;
   overflow-wrap: break-word;
   color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
 }
 
 /* Grid Cell Specific Styles */
@@ -814,6 +811,15 @@
 
 .why-cell {
   line-height: 1.5;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+  word-wrap: break-word;
+  max-height: 3em;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 .date-cell {
@@ -972,17 +978,15 @@
   .data-grid-header,
   .data-grid-row {
     grid-template-columns:
-      minmax(calc(var(--dynamic-min-width, 80px) * 0.7), 1fr)     /* Name */
-      minmax(calc(var(--dynamic-min-width, 50px) * 0.5), 0.6fr)   /* Type */
-      minmax(calc(var(--dynamic-min-width, 60px) * 0.6), 0.7fr)   /* Who */
-      minmax(calc(var(--dynamic-min-width, 90px) * 0.8), 1.3fr)   /* Why */
-      minmax(calc(var(--dynamic-min-width, 60px) * 0.5), 0.6fr)   /* Date */
-      minmax(35px, 0.3fr);  /* Actions */
+      1fr      /* Name */
+      0.7fr    /* Type */
+      0.8fr    /* Who */
+      1.5fr    /* Why */
+      0.7fr    /* Date */
+      0.3fr;   /* Actions */
     gap: clamp(0.25rem, 1.5vw, 0.5rem);
     padding: clamp(0.5rem, 2vw, 0.75rem);
     font-size: clamp(0.75rem, 2.5vw, 0.85rem);
-    width: 100%;
-    max-width: 100%;
   }
   
   .grid-cell {
@@ -1083,17 +1087,15 @@
   .data-grid-header,
   .data-grid-row {
     grid-template-columns:
-      minmax(calc(var(--dynamic-min-width, 60px) * 0.6), 0.9fr)   /* Name */
-      minmax(calc(var(--dynamic-min-width, 40px) * 0.4), 0.5fr)   /* Type */
-      minmax(calc(var(--dynamic-min-width, 50px) * 0.5), 0.6fr)   /* Who */
-      minmax(calc(var(--dynamic-min-width, 70px) * 0.7), 1.2fr)   /* Why */
-      minmax(calc(var(--dynamic-min-width, 50px) * 0.4), 0.5fr)   /* Date */
-      minmax(30px, 0.25fr); /* Actions */
+      0.9fr    /* Name */
+      0.6fr    /* Type */
+      0.7fr    /* Who */
+      1.4fr    /* Why */
+      0.6fr    /* Date */
+      0.3fr;   /* Actions */
     gap: clamp(0.125rem, 1vw, 0.25rem);
     padding: clamp(0.25rem, 1.5vw, 0.5rem);
     font-size: clamp(0.65rem, 2vw, 0.75rem);
-    width: 100%;
-    max-width: 100%;
   }
   
   .grid-cell {
