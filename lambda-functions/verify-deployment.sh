@@ -34,6 +34,29 @@ TESTS_PASSED=0
 TESTS_FAILED=0
 TESTS_TOTAL=0
 
+# Function to clean up test entries
+cleanup_test_entries() {
+    log_info "Cleaning up verification test entries..."
+
+    # Clean up portfolio test entries
+    API_BASE_URL="https://n9x7n282md.execute-api.us-east-1.amazonaws.com/prod"
+
+    # Get all entries and filter for test entries
+    TEST_ENTRIES=$(curl -s "$API_BASE_URL/entries" | grep -o '"id":"[^"]*"[^}]*"name":"[^"]*\[VERIFY_TEST\]' | grep -o '"id":"[^"]*"' | cut -d'"' -f4)
+
+    if [ ! -z "$TEST_ENTRIES" ]; then
+        echo "$TEST_ENTRIES" | while read -r entry_id; do
+            if [ ! -z "$entry_id" ]; then
+                log_info "Removing verification test entry: $entry_id"
+                curl -s -X DELETE "$API_BASE_URL/entries/$entry_id" > /dev/null
+            fi
+        done
+        log_success "Verification test entries cleaned up"
+    else
+        log_info "No verification test entries found to clean up"
+    fi
+}
+
 # Function to run test and track results
 run_test() {
     local test_name="$1"
@@ -137,8 +160,23 @@ for FUNCTION_NAME in "${FUNCTIONS[@]}"; do
                 ;;
             "portfolio-create-entry")
                 run_test "$FUNCTION_NAME Lambda" \
-                    "aws lambda invoke --function-name $FUNCTION_NAME --payload '{\"body\": \"{\\\"name\\\":\\\"Verification Test Entry\\\",\\\"type\\\":\\\"Test\\\",\\\"who\\\":\\\"VerificationScript\\\",\\\"why\\\":\\\"Testing deployment\\\"}\"}' --cli-binary-format raw-in-base64-out $TEMP_DIR/lambda_response.json --region eu-north-1 && cat $TEMP_DIR/lambda_response.json" \
+                    "aws lambda invoke --function-name $FUNCTION_NAME --payload '{\"body\": \"{\\\"name\\\":\\\"[VERIFY_TEST] Verification Test Entry\\\",\\\"type\\\":\\\"Test\\\",\\\"who\\\":\\\"VerificationScript\\\",\\\"why\\\":\\\"Testing deployment\\\"}\"}' --cli-binary-format raw-in-base64-out $TEMP_DIR/lambda_response.json --region eu-north-1 && cat $TEMP_DIR/lambda_response.json" \
                     '"statusCode": 201'
+
+                # Verify the entry actually exists in the database
+                echo -n "  Verifying entry exists in database... "
+                for attempt in 1 2 3 4 5; do
+                    if curl -s "https://n9x7n282md.execute-api.us-east-1.amazonaws.com/prod/entries" | grep -q "\\[VERIFY_TEST\\]"; then
+                        echo -e "${GREEN}✅ CONFIRMED${NC}"
+                        break
+                    elif [ $attempt -eq 5 ]; then
+                        echo -e "${YELLOW}⚠️  Entry not found in database${NC}"
+                        ((TESTS_FAILED++))
+                        ((TESTS_TOTAL++))
+                    else
+                        sleep 1
+                    fi
+                done
                 ;;
             "portfolio-delete-entry")
                 run_test "$FUNCTION_NAME Lambda" \
@@ -184,7 +222,7 @@ run_test "GET /entries endpoint" \
     "200"
 
 # Test POST /entries endpoint
-ENTRY_JSON='{"name":"API Test Entry","type":"Test","who":"API Tester","why":"Testing API endpoint"}'
+ENTRY_JSON='{"name":"[VERIFY_TEST] API Test Entry","type":"Test","who":"API Tester","why":"Testing API endpoint"}'
 run_test "POST /entries endpoint" \
     "curl -s -w '%{http_code}' -X POST '$API_BASE_URL/entries' -H 'Content-Type: application/json' -d '$ENTRY_JSON'" \
     "201"
@@ -254,6 +292,9 @@ run_test "CORS Access-Control-Allow-Origin header" \
     ""
 
 echo ""
+
+# Clean up test entries created during verification
+cleanup_test_entries
 
 # Summary
 log_header "Verification Summary"
