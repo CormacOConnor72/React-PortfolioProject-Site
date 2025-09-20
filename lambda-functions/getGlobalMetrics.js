@@ -16,12 +16,21 @@ exports.handler = async (event) => {
 
   try {
     // Get all spins (in production, consider using pagination for large datasets)
-    const command = new ScanCommand({
+    const spinsCommand = new ScanCommand({
       TableName: 'SpinHistory'
     });
 
-    const result = await ddbDocClient.send(command);
-    const spins = result.Items || [];
+    const spinsResult = await ddbDocClient.send(spinsCommand);
+    const spins = spinsResult.Items || [];
+
+    // Get current active entries to filter against
+    const entriesCommand = new ScanCommand({
+      TableName: 'portfolio-data-entries'
+    });
+
+    const entriesResult = await ddbDocClient.send(entriesCommand);
+    const activeEntries = entriesResult.Items || [];
+    const activeEntryNames = new Set(activeEntries.map(entry => entry.name));
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -38,11 +47,13 @@ exports.handler = async (event) => {
       new Date(spin.timestamp) >= weekAgo
     ).length;
 
-    // Calculate top entries
+    // Calculate top entries (only include entries that still exist)
     const entryCounts = {};
     spins.forEach(spin => {
       const key = spin.entryName;
-      entryCounts[key] = (entryCounts[key] || 0) + 1;
+      if (activeEntryNames.has(key)) {
+        entryCounts[key] = (entryCounts[key] || 0) + 1;
+      }
     });
 
     const topEntries = Object.entries(entryCounts)
@@ -50,11 +61,13 @@ exports.handler = async (event) => {
       .sort((a, b) => b.count - a.count)
       .slice(0, 10);
 
-    // Calculate type distribution
+    // Calculate type distribution (only include types from entries that still exist)
     const typeCounts = {};
     spins.forEach(spin => {
-      const type = spin.entryType || 'Unknown';
-      typeCounts[type] = (typeCounts[type] || 0) + 1;
+      if (activeEntryNames.has(spin.entryName)) {
+        const type = spin.entryType || 'Unknown';
+        typeCounts[type] = (typeCounts[type] || 0) + 1;
+      }
     });
 
     const typeDistribution = Object.entries(typeCounts)
